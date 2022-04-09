@@ -4,10 +4,11 @@
 #include <stdlib.h>
 #include <inttypes.h>
 #include <string.h>
+#include <ctype.h>
 
 #include "../../C/My_Lib/My_Lib.h"
 
-#define DEBUG 1
+#define DEBUG 0
 
 #if DEBUG == 0
 #undef MY_ASSERT
@@ -57,5 +58,6 @@ struct Pair HT_Search (const struct Hash_Table *ht_ptr, const char *data);
 
 int HT_Dump (const struct Hash_Table *ht_ptr);
 
+int HT_Fill (struct Hash_Table *ht_ptr, const char *file_name);
 
 #endif

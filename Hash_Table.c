@@ -331,7 +331,7 @@ static void Print_List (FILE *file, struct Node *node_ptr, const uint32_t cell_i
 static void Print_HT (FILE *file, const struct Hash_Table *ht_ptr)
 {
     for (uint32_t cell_i = 0; cell_i < ht_ptr->size; cell_i++)
-    {
+    {        
         if (ht_ptr->array[cell_i] != NULL)
         {
             fprintf (file, "\t\tsubgraph bucket%u\n"
@@ -399,6 +399,57 @@ int HT_Dump (const struct Hash_Table *ht_ptr)
     Close_File (file, "Dump/Dump.dot");
 
     system ("dot -Tpng Dump/Dump.dot -o Dump/Dump.png");
+
+    return NO_ERRORS;
+}
+
+//***********************************************************************************************//
+
+//***********************************************************************************************//
+//                                          FILLING                                              //
+//***********************************************************************************************//
+
+static int Divide_In_Words (struct Hash_Table *ht_ptr, const char *buffer, const long n_symbs)
+{
+    MY_ASSERT (ht_ptr, "struct Hash_Table *ht_ptr", NULL_PTR, ERROR);
+    MY_ASSERT (buffer, "const char *buffer",        NULL_PTR, ERROR);
+    
+    char temp_buffer[50]  = "";
+    char clean_buffer[50] = "";
+
+    long temp_i = 0L;
+    for (long symb_i = 0; symb_i < n_symbs; symb_i++)
+    {
+        if ( isalpha (buffer[symb_i]) || buffer[symb_i] == '\'')
+            temp_buffer[temp_i++] = buffer[symb_i];
+        else if ( isspace (buffer[symb_i]) && temp_i > 0 )
+        {
+            HT_Insert (ht_ptr, temp_buffer);
+            temp_i = 0L;
+            
+            memmove (temp_buffer, clean_buffer, 50);
+        }
+    }
+
+    if (temp_i != 0)
+        HT_Insert (ht_ptr, temp_buffer);
+
+    return NO_ERRORS;
+}
+
+int HT_Fill (struct Hash_Table *ht_ptr, const char *file_name)
+{
+    MY_ASSERT (ht_ptr, "struct Hash_Table *ht_ptr", NULL_PTR, ERROR);
+
+    FILE *file = Open_File (file_name, "rb");
+
+    long n_symbs = Define_File_Size (file);
+
+    char *buffer = Make_Buffer (file, n_symbs);
+
+    Close_File (file, file_name);
+
+    Divide_In_Words (ht_ptr, buffer, n_symbs);
 
     return NO_ERRORS;
 }
