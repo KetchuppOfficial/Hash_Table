@@ -22,3 +22,4 @@ run:
 
 clean:
 	rm Hash_Table.out
+	rm log_file.log
