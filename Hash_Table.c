@@ -1,11 +1,9 @@
 #include "Hash_Table.h"
 #include "../../C/SHA_256/sha_256.h"
 
-const uint32_t ht_size = 50;
-
-//**************************************************************************************************
-//                           CONSTRUCTORS, DESTRUCTORS AND HASH FUNCTIONS
-//**************************************************************************************************
+//************************************************************************************************//
+//                           CONSTRUCTORS, DESTRUCTORS AND HASH FUNCTIONS                         //
+//************************************************************************************************//
 
 //-----------------------------------------------------------------------------
 static uint32_t Cringe_1 (const char *data)
@@ -49,13 +47,15 @@ static uint32_t Ded_Hash (const char *data)
 }
 //-----------------------------------------------------------------------------
 
-struct Hash_Table *HT_Ctor (enum Hash_Func function)
+struct Hash_Table *HT_Ctor (enum Hash_Func function, uint32_t ht_size)
 {
     struct Hash_Table *ht_ptr = (struct Hash_Table *)calloc (1, sizeof (struct Hash_Table));
     MY_ASSERT (ht_ptr, "struct Hash_Table *ht_ptr", NE_MEM, NULL);
 
     ht_ptr->array = (struct Node **)calloc (ht_size, sizeof (struct Node *));
     MY_ASSERT (ht_ptr->array, "ht_ptr->array", NE_MEM, NULL);
+
+    ht_ptr->size = ht_size;
 
     switch (function)
     {
@@ -117,7 +117,7 @@ int HT_Dtor (struct Hash_Table *ht_ptr)
 {
     MY_ASSERT (ht_ptr, "struct Hash_Table *ht_ptr", NULL_PTR, ERROR);
     
-    for (uint32_t i = 0; i < ht_size; i++)
+    for (uint32_t i = 0; i < ht_ptr->size; i++)
     {
         if (ht_ptr->array[i] == NULL)
             continue;
@@ -130,11 +130,11 @@ int HT_Dtor (struct Hash_Table *ht_ptr)
 
     return NO_ERRORS;
 }
-//*************************************************************************************************
+//***********************************************************************************************//
 
-//*************************************************************************************************
-//                                            INSERTION
-//*************************************************************************************************
+//***********************************************************************************************//
+//                                            INSERTION                                          //
+//***********************************************************************************************//
 
 static struct Node *Add_Node (const char *data)
 {
@@ -161,8 +161,8 @@ int HT_Insert (struct Hash_Table *ht_ptr, const char *data)
     MY_ASSERT (data,   "const char *data",          NULL_PTR, ERROR);
 
     uint32_t hash = (* ht_ptr->hash_func)(data);
-    if (hash > ht_size - 1)
-        hash = hash % ht_size;
+    if (hash > ht_ptr->size - 1)
+        hash = hash % ht_ptr->size;
 
     if (ht_ptr->array[hash] == NULL)
         ht_ptr->array[hash] = Add_Node (data);
@@ -185,9 +185,9 @@ int HT_Insert (struct Hash_Table *ht_ptr, const char *data)
 
 //*************************************************************************************************
 
-//*************************************************************************************************
-//                                     SEARCHING AND DELETING
-//*************************************************************************************************
+//***********************************************************************************************//
+//                                     SEARCHING AND DELETING                                    //
+//***********************************************************************************************//
 
 struct Pair HT_Search (const struct Hash_Table *ht_ptr, const char *data)
 {
@@ -197,10 +197,10 @@ struct Pair HT_Search (const struct Hash_Table *ht_ptr, const char *data)
     #endif
     
     uint32_t hash = (* ht_ptr->hash_func)(data);
-    if (hash > ht_size - 1)
-        hash = hash % ht_size;
+    if (hash > ht_ptr->size - 1)
+        hash = hash % ht_ptr->size;
 
-    struct Pair pair = {hash, NOT_FOUND};  // -1 means that there is no element with calculated hash
+    struct Pair pair = {hash, NOT_FOUND};
 
     if (ht_ptr->array[hash] == NULL)
         return pair;
@@ -232,7 +232,7 @@ struct Pair HT_Search (const struct Hash_Table *ht_ptr, const char *data)
 
 static inline void Delete_Beg_ (struct Hash_Table *ht_ptr, const uint32_t hash, struct Node *current)
 {
-    ht_ptr->array[hash] = NULL;
+    ht_ptr->array[hash] = (current->next == NULL) ? NULL : current->next;
 
     free (current->data);
     free (current);
@@ -259,8 +259,8 @@ int HT_Delete (struct Hash_Table *ht_ptr, const char *data)
     MY_ASSERT (data,   "const char *data",          NULL_PTR, ERROR);
 
     uint32_t hash = (* ht_ptr->hash_func)(data);
-    if (hash > ht_size - 1)
-        hash = hash % ht_size;
+    if (hash > ht_ptr->size - 1)
+        hash = hash % ht_ptr->size;
 
     struct Pair pair = {hash, NOT_FOUND};
 
@@ -275,8 +275,12 @@ int HT_Delete (struct Hash_Table *ht_ptr, const char *data)
         for (pair.node_i = 0; next != NULL; pair.node_i++)
         {
             if (strcmp (current->data, data) == 0)
-            {
-                Delete_Mid_ (prev, current, next);
+            {               
+                if (pair.node_i == 0)
+                    Delete_Beg_ (ht_ptr, hash, current);
+                else
+                    Delete_Mid_ (prev, current, next);
+
                 return NO_ERRORS;
             }
             else
@@ -301,3 +305,102 @@ int HT_Delete (struct Hash_Table *ht_ptr, const char *data)
 }
 
 //*************************************************************************************************
+
+
+//***********************************************************************************************//
+//                                              DUMP                                             //
+//***********************************************************************************************//
+
+static void Print_List (FILE *file, struct Node *node_ptr, const uint32_t cell_i)
+{
+    struct Node *current = node_ptr;
+    struct Node *next = node_ptr->next;
+    
+    int node_i = 0;
+    for ( ; next != NULL; node_i++)
+    {
+        fprintf (file, "\t\t\tstring%u_%u [label = \"%s\", color = lightskyblue];\n", cell_i, node_i, current->data);
+
+        current = next;
+        next = current->next;
+    }
+
+    fprintf (file, "\t\t\tstring%u_%d [label = \"%s\", color = lightskyblue];\n", cell_i, node_i, current->data);
+}
+
+static void Print_HT (FILE *file, const struct Hash_Table *ht_ptr)
+{
+    for (uint32_t cell_i = 0; cell_i < ht_ptr->size; cell_i++)
+    {
+        if (ht_ptr->array[cell_i] != NULL)
+        {
+            fprintf (file, "\t\tsubgraph bucket%u\n"
+                           "\t\t{\n"
+                           "\t\t\trankdir=TB\n", cell_i);
+            
+            fprintf (file, "\t\t\tnode%u [label = \"[%u]\", fillcolor = aquamarine];\n", cell_i, cell_i);
+            Print_List (file, ht_ptr->array[cell_i], cell_i);
+
+            fprintf (file, "\t\t}\n\n");
+        }
+        else
+            fprintf (file, "\t\tnode%u [label = \"[%u]\", fillcolor = aquamarine];\n\n", cell_i, cell_i);
+    }
+}
+
+static void Print_Arrows (FILE *file, const struct Hash_Table *ht_ptr)
+{
+    for (uint32_t cell_i = 0; cell_i < ht_ptr->size; cell_i++)
+    {
+        if (cell_i < ht_ptr->size - 1)
+            fprintf (file, "\t\tnode%u -> node%u [color = red, constraint = false, arrowhead = none]\n", cell_i, cell_i + 1);
+        
+        if (ht_ptr->array[cell_i] != NULL)
+        {
+            fprintf (file, "\t\tnode%u -> string%u_%d [color = navy];\n", cell_i, cell_i, 0);
+
+            struct Node *current = ht_ptr->array[cell_i];
+            struct Node *next = current->next;
+            
+            for (int node_i = 0; next != NULL; node_i++)
+            {
+                fprintf (file, "\t\tstring%u_%d -> string%u_%d [color = navy];\n", 
+                               cell_i, node_i, cell_i, node_i + 1);
+
+                current = next;
+                next = current->next;
+            }            
+        }
+
+        fprintf (file, "\n");
+    }
+}
+
+int HT_Dump (const struct Hash_Table *ht_ptr)
+{
+    FILE *file = Open_File ("Dump/Dump.dot", "wb");
+
+    fprintf (file, "digraph Hash_Table\n"
+                         "{\n"
+                                "\tgraph [dpi = 200]\n"
+                                "\tsplines = ortho\n"
+                                "\tnode [shape = box, style = filled];\n"
+                                "\tsize [shape = record, fillcolor = springgreen, label = \"<0> SIZE | <1> %u\"];\n"
+                                "\tsubgraph Array\n"
+                                "\t{\n"
+                                    "\t\tbgcolor = gray70;\n"
+                                    "\t\trankdir = LR;\n\n", ht_ptr->size);
+
+    Print_HT (file, ht_ptr);
+    Print_Arrows (file, ht_ptr);
+
+    fprintf (file, "\t}\n}\n");
+
+    Close_File (file, "Dump/Dump.dot");
+
+    system ("dot -Tpng Dump/Dump.dot -o Dump/Dump.png");
+
+    return NO_ERRORS;
+}
+
+//***********************************************************************************************//

@@ -1,0 +1,102 @@
+digraph Hash_Table
+{
+	graph [dpi = 200]
+	splines = ortho
+	node [shape = box, style = filled];
+	size [shape = record, fillcolor = springgreen, label = "<0> SIZE | <1> 10"];
+	subgraph Array
+	{
+		bgcolor = gray70;
+		rankdir = LR;
+
+		subgraph bucket0
+		{
+			rankdir=TB
+			node0 [label = "[0]", fillcolor = aquamarine];
+			string0_0 [label = "May the Force be with you", color = lightskyblue];
+		}
+
+		node1 [label = "[1]", fillcolor = aquamarine];
+
+		node2 [label = "[2]", fillcolor = aquamarine];
+
+		node3 [label = "[3]", fillcolor = aquamarine];
+
+		subgraph bucket4
+		{
+			rankdir=TB
+			node4 [label = "[4]", fillcolor = aquamarine];
+			string4_0 [label = "Bazinga!", color = lightskyblue];
+			string4_1 [label = "To the Batmobile!", color = lightskyblue];
+		}
+
+		subgraph bucket5
+		{
+			rankdir=TB
+			node5 [label = "[5]", fillcolor = aquamarine];
+			string5_0 [label = "How you doin'?", color = lightskyblue];
+			string5_1 [label = "Live long and prosper", color = lightskyblue];
+			string5_2 [label = "The name is Bond, James Bond", color = lightskyblue];
+		}
+
+		subgraph bucket6
+		{
+			rankdir=TB
+			node6 [label = "[6]", fillcolor = aquamarine];
+			string6_0 [label = "Suit up!", color = lightskyblue];
+			string6_1 [label = "Hasta la vista, baby", color = lightskyblue];
+		}
+
+		node7 [label = "[7]", fillcolor = aquamarine];
+
+		subgraph bucket8
+		{
+			rankdir=TB
+			node8 [label = "[8]", fillcolor = aquamarine];
+			string8_0 [label = "I love the smell of napalm in the morning", color = lightskyblue];
+		}
+
+		subgraph bucket9
+		{
+			rankdir=TB
+			node9 [label = "[9]", fillcolor = aquamarine];
+			string9_0 [label = "It will be legendary!", color = lightskyblue];
+			string9_1 [label = "Awesome", color = lightskyblue];
+			string9_2 [label = "Come with me if you want to live", color = lightskyblue];
+			string9_3 [label = "Space, the final frontier...", color = lightskyblue];
+		}
+
+		node0 -> node1 [color = red, constraint = false, arrowhead = none]
+		node0 -> string0_0 [color = navy];
+
+		node1 -> node2 [color = red, constraint = false, arrowhead = none]
+
+		node2 -> node3 [color = red, constraint = false, arrowhead = none]
+
+		node3 -> node4 [color = red, constraint = false, arrowhead = none]
+
+		node4 -> node5 [color = red, constraint = false, arrowhead = none]
+		node4 -> string4_0 [color = navy];
+		string4_0 -> string4_1 [color = navy];
+
+		node5 -> node6 [color = red, constraint = false, arrowhead = none]
+		node5 -> string5_0 [color = navy];
+		string5_0 -> string5_1 [color = navy];
+		string5_1 -> string5_2 [color = navy];
+
+		node6 -> node7 [color = red, constraint = false, arrowhead = none]
+		node6 -> string6_0 [color = navy];
+		string6_0 -> string6_1 [color = navy];
+
+		node7 -> node8 [color = red, constraint = false, arrowhead = none]
+
+		node8 -> node9 [color = red, constraint = false, arrowhead = none]
+		node8 -> string8_0 [color = navy];
+
+		node9 -> string9_0 [color = navy];
+		string9_0 -> string9_1 [color = navy];
+		string9_1 -> string9_2 [color = navy];
+		string9_2 -> string9_3 [color = navy];
+
+	}
+}

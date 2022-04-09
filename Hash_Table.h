@@ -24,6 +24,7 @@ struct Hash_Table
 {
     struct Node **array;
     uint32_t (* hash_func)(const char *);
+    uint32_t size;
 };
 
 enum Hash_Func
@@ -47,12 +48,14 @@ enum Status
     NOT_FOUND = -1
 };
 
-struct Hash_Table *HT_Ctor (enum Hash_Func function);
+struct Hash_Table *HT_Ctor (enum Hash_Func function, uint32_t ht_size);
 int                HT_Dtor (struct Hash_Table *ht_ptr);
 
 int         HT_Insert (struct Hash_Table *ht_ptr, const char *data);
 int         HT_Delete (struct Hash_Table *ht_ptr, const char *data);
 struct Pair HT_Search (const struct Hash_Table *ht_ptr, const char *data);
+
+int HT_Dump (const struct Hash_Table *ht_ptr);
 
 
 #endif
