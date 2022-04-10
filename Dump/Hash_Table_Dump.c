@@ -71,6 +71,8 @@ static void Print_Arrows (FILE *file, const struct Hash_Table *ht_ptr)
 
 int HT_Dump (const struct Hash_Table *ht_ptr)
 {
+    MY_ASSERT (ht_ptr, "cosnt struct Hash_Table *ht_ptr", NULL_PTR, ERROR);
+    
     FILE *file = Open_File ("Dump/Dump.dot", "wb");
 
     fprintf (file, "digraph Hash_Table\n"

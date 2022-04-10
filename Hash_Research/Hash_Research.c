@@ -8,6 +8,7 @@ static int Divide_In_Words (struct Hash_Table *ht_ptr, const char *buffer, const
 {
     MY_ASSERT (ht_ptr, "struct Hash_Table *ht_ptr", NULL_PTR, ERROR);
     MY_ASSERT (buffer, "const char *buffer",        NULL_PTR, ERROR);
+    MY_ASSERT (buffer, "const long n_symbs",        POS_VAL,  ERROR);
     
     char temp_buffer[50]  = "";
     char clean_buffer[50] = "";
@@ -19,7 +20,13 @@ static int Divide_In_Words (struct Hash_Table *ht_ptr, const char *buffer, const
             temp_buffer[temp_i++] = buffer[symb_i];
         else if ( isspace (buffer[symb_i]) && temp_i > 0 )
         {
+            #if DEBUG == 0
             HT_Insert (ht_ptr, temp_buffer);
+            #elif DEBUG == 1
+            int ret_val = HT_Insert (ht_ptr, temp_buffer);
+            MY_ASSERT (ret_val == NO_ERRORS, "HT_Insert ()", FUNC_ERROR, ERROR);
+            #endif
+
             temp_i = 0L;
             
             memmove (temp_buffer, clean_buffer, 50);
@@ -27,7 +34,14 @@ static int Divide_In_Words (struct Hash_Table *ht_ptr, const char *buffer, const
     }
 
     if (temp_i != 0)
+    {
+        #if DEBUG == 0
         HT_Insert (ht_ptr, temp_buffer);
+        #elif DEBUG == 1
+        int ret_val = HT_Insert (ht_ptr, temp_buffer);
+        MY_ASSERT (ret_val == NO_ERRORS, "HT_Insert ()", FUNC_ERROR, ERROR);
+        #endif
+    }
 
     return NO_ERRORS;
 }
@@ -35,23 +49,30 @@ static int Divide_In_Words (struct Hash_Table *ht_ptr, const char *buffer, const
 int HT_Fill (struct Hash_Table *ht_ptr, const char *file_name)
 {
     MY_ASSERT (ht_ptr, "struct Hash_Table *ht_ptr", NULL_PTR, ERROR);
+    MY_ASSERT (ht_ptr, "const char *file_name",     NULL_PTR, ERROR);
 
     FILE *file = Open_File (file_name, "rb");
 
     long n_symbs = Define_File_Size (file);
+    MY_ASSERT (n_symbs != ERROR, "Define_File_Size ()", FUNC_ERROR, ERROR);
 
     char *buffer = Make_Buffer (file, n_symbs);
 
     Close_File (file, file_name);
 
+    #if DEBUG == 0
     Divide_In_Words (ht_ptr, buffer, n_symbs);
+    #elif DEBUG == 1
+    int ret_val = Divide_In_Words (ht_ptr, buffer, n_symbs);
+    MY_ASSERT (ret_val != ERROR, "Divide_In_Words ()", FUNC_ERROR, ERROR);
+    #endif
 
     return NO_ERRORS;
 }
 
 int *HT_Count_Collisions (const struct Hash_Table *ht_ptr)
 {
-    MY_ASSERT (ht_ptr,        "const struct Hash_Table *ht_ptr", NULL_PTR, NULL);
+    MY_ASSERT (ht_ptr, "const struct Hash_Table *ht_ptr", NULL_PTR, NULL);
 
     int *collision_arr = (int *)calloc (ht_ptr->size, sizeof (int));
     MY_ASSERT (collision_arr, "int *collision_arr", NE_MEM, NULL);
@@ -77,36 +98,46 @@ int *HT_Count_Collisions (const struct Hash_Table *ht_ptr)
     return collision_arr;
 }
 
+static const char names_arr[][29] = 
+{
+    "Hash_Research/Cringe_1.txt",
+    "Hash_Research/ASCII_Hash.txt",
+    "Hash_Research/Len_Hash.txt",
+    "Hash_Research/Checksum.txt",
+    "Hash_Research/Ded_Hash.txt",
+    "Hash_Research/Sha_256.txt",
+};
+
 int HT_Print_Collisons (const struct Hash_Table *ht_ptr)
 {
-    MY_ASSERT (ht_ptr,    "const Hash_Table *ht_ptr", NULL_PTR, ERROR);
+    MY_ASSERT (ht_ptr, "const Hash_Table *ht_ptr", NULL_PTR, ERROR);
     
     char file_name[29] =  "";
 
     switch (ht_ptr->hash_func_name)
     {
         case CRINGE_1:
-            memmove (file_name, "Hash_Research/Cringe_1.txt",   sizeof "Hash_Research/Cringe_1.txt");
+            memmove (file_name, names_arr[CRINGE_1],   sizeof names_arr[CRINGE_1]);
             break;
 
         case ASCII_HASH:
-            memmove (file_name, "Hash_Research/ASCII_Hash.txt", sizeof "Hash_Research/ASCII_Hash.txt");
+            memmove (file_name, names_arr[ASCII_HASH], sizeof names_arr[ASCII_HASH]);
             break;
 
         case LEN_HASH:
-            memmove (file_name, "Hash_Research/Len_Hash.txt",   sizeof "Hash_Research/Len_Hash.txt");
+            memmove (file_name, names_arr[LEN_HASH],   sizeof names_arr[LEN_HASH]);
             break;
 
         case CHECKSUM:
-            memmove (file_name, "Hash_Research/Checksum.txt",   sizeof "Hash_Research/Checksum.txt");
+            memmove (file_name, names_arr[CHECKSUM],   sizeof names_arr[CHECKSUM]);
             break;
         
         case DED_HASH:
-            memmove (file_name, "Hash_Research/Ded_Hash.txt",   sizeof "Hash_Research/Ded_Hash.txt");
+            memmove (file_name, names_arr[DED_HASH],   sizeof names_arr[DED_HASH]);
             break;
 
         case SHA_256:
-            memmove (file_name, "Hash_Research/Sha_256.txt",    sizeof "Hash_Research/Sha_256.txt");
+            memmove (file_name, names_arr[SHA_256],    sizeof names_arr[SHA_256]);
             break;
     
         default:
@@ -114,6 +145,7 @@ int HT_Print_Collisons (const struct Hash_Table *ht_ptr)
     }
 
     int *collision_arr = HT_Count_Collisions (ht_ptr);
+    MY_ASSERT (collision_arr, "HT_Count_Collisions ()", FUNC_ERROR, ERROR);
 
     FILE *file = Open_File (file_name, "wb");
     

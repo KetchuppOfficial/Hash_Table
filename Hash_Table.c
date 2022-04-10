@@ -109,6 +109,7 @@ static int List_Dtor (struct Node *node_ptr)
     {
         prev = current;
         current = current->next;
+
         free (prev->data);
         free (prev);
     }
@@ -171,7 +172,14 @@ int HT_Insert (struct Hash_Table *ht_ptr, const char *data)
         hash = hash % ht_ptr->size;
 
     if (ht_ptr->array[hash] == NULL)
+    {
         ht_ptr->array[hash] = Add_Node (data);
+
+        #if DEBUG == 1
+        if (ht_ptr->array[hash] == NULL)
+            MY_ASSERT (false, "Add_Node ()", FUNC_ERROR, ERROR);
+        #endif
+    }
     else
     {
         struct Node *current = ht_ptr->array[hash];
@@ -184,6 +192,10 @@ int HT_Insert (struct Hash_Table *ht_ptr, const char *data)
         }
 
         current->next = Add_Node (data);
+        #if DEBUG == 1
+        if (current->next == NULL)
+            MY_ASSERT (false, "Add_Node ()", FUNC_ERROR, ERROR);
+        #endif
     }
 
     return NO_ERRORS;
