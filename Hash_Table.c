@@ -61,26 +61,32 @@ struct Hash_Table *HT_Ctor (enum Hash_Func function, uint32_t ht_size)
     {
         case CRINGE_1:
             ht_ptr->hash_func = Cringe_1;
+            ht_ptr->hash_func_name = CRINGE_1;
             break;
 
         case ASCII_HASH:
             ht_ptr->hash_func = ASCII_Hash;
+            ht_ptr->hash_func_name = ASCII_HASH;
             break;
 
         case LEN_HASH:
             ht_ptr->hash_func = Len_Hash;
+            ht_ptr->hash_func_name = LEN_HASH;
             break;
 
         case CHECKSUM:
             ht_ptr->hash_func = Checksum;
+            ht_ptr->hash_func_name = CHECKSUM;
             break;
         
         case DED_HASH:
             ht_ptr->hash_func = Ded_Hash;
+            ht_ptr->hash_func_name = DED_HASH;
             break;
 
         case SHA_256:
             ht_ptr->hash_func = sha_256_32;
+            ht_ptr->hash_func_name = SHA_256;
             break;
     
         default:
@@ -305,153 +311,3 @@ int HT_Delete (struct Hash_Table *ht_ptr, const char *data)
 }
 
 //*************************************************************************************************
-
-
-//***********************************************************************************************//
-//                                              DUMP                                             //
-//***********************************************************************************************//
-
-static void Print_List (FILE *file, struct Node *node_ptr, const uint32_t cell_i)
-{
-    struct Node *current = node_ptr;
-    struct Node *next = node_ptr->next;
-    
-    int node_i = 0;
-    for ( ; next != NULL; node_i++)
-    {
-        fprintf (file, "\t\t\tstring%u_%u [label = \"%s\", color = lightskyblue];\n", cell_i, node_i, current->data);
-
-        current = next;
-        next = current->next;
-    }
-
-    fprintf (file, "\t\t\tstring%u_%d [label = \"%s\", color = lightskyblue];\n", cell_i, node_i, current->data);
-}
-
-static void Print_HT (FILE *file, const struct Hash_Table *ht_ptr)
-{
-    for (uint32_t cell_i = 0; cell_i < ht_ptr->size; cell_i++)
-    {        
-        if (ht_ptr->array[cell_i] != NULL)
-        {
-            fprintf (file, "\t\tsubgraph bucket%u\n"
-                           "\t\t{\n"
-                           "\t\t\trankdir=TB\n", cell_i);
-            
-            fprintf (file, "\t\t\tnode%u [label = \"[%u]\", fillcolor = aquamarine];\n", cell_i, cell_i);
-            Print_List (file, ht_ptr->array[cell_i], cell_i);
-
-            fprintf (file, "\t\t}\n\n");
-        }
-        else
-            fprintf (file, "\t\tnode%u [label = \"[%u]\", fillcolor = aquamarine];\n\n", cell_i, cell_i);
-    }
-}
-
-static void Print_Arrows (FILE *file, const struct Hash_Table *ht_ptr)
-{
-    for (uint32_t cell_i = 0; cell_i < ht_ptr->size; cell_i++)
-    {
-        if (cell_i < ht_ptr->size - 1)
-            fprintf (file, "\t\tnode%u -> node%u [color = red, constraint = false, arrowhead = none]\n", cell_i, cell_i + 1);
-        
-        if (ht_ptr->array[cell_i] != NULL)
-        {
-            fprintf (file, "\t\tnode%u -> string%u_%d [color = navy];\n", cell_i, cell_i, 0);
-
-            struct Node *current = ht_ptr->array[cell_i];
-            struct Node *next = current->next;
-            
-            for (int node_i = 0; next != NULL; node_i++)
-            {
-                fprintf (file, "\t\tstring%u_%d -> string%u_%d [color = navy];\n", 
-                               cell_i, node_i, cell_i, node_i + 1);
-
-                current = next;
-                next = current->next;
-            }            
-        }
-
-        fprintf (file, "\n");
-    }
-}
-
-int HT_Dump (const struct Hash_Table *ht_ptr)
-{
-    FILE *file = Open_File ("Dump/Dump.dot", "wb");
-
-    fprintf (file, "digraph Hash_Table\n"
-                         "{\n"
-                                "\tgraph [dpi = 200]\n"
-                                "\tsplines = ortho\n"
-                                "\tnode [shape = box, style = filled];\n"
-                                "\tsize [shape = record, fillcolor = springgreen, label = \"<0> SIZE | <1> %u\"];\n"
-                                "\tsubgraph Array\n"
-                                "\t{\n"
-                                    "\t\tbgcolor = gray70;\n"
-                                    "\t\trankdir = LR;\n\n", ht_ptr->size);
-
-    Print_HT (file, ht_ptr);
-    Print_Arrows (file, ht_ptr);
-
-    fprintf (file, "\t}\n}\n");
-
-    Close_File (file, "Dump/Dump.dot");
-
-    system ("dot -Tpng Dump/Dump.dot -o Dump/Dump.png");
-
-    return NO_ERRORS;
-}
-
-//***********************************************************************************************//
-
-//***********************************************************************************************//
-//                                          FILLING                                              //
-//***********************************************************************************************//
-
-static int Divide_In_Words (struct Hash_Table *ht_ptr, const char *buffer, const long n_symbs)
-{
-    MY_ASSERT (ht_ptr, "struct Hash_Table *ht_ptr", NULL_PTR, ERROR);
-    MY_ASSERT (buffer, "const char *buffer",        NULL_PTR, ERROR);
-    
-    char temp_buffer[50]  = "";
-    char clean_buffer[50] = "";
-
-    long temp_i = 0L;
-    for (long symb_i = 0; symb_i < n_symbs; symb_i++)
-    {
-        if ( isalpha (buffer[symb_i]) || buffer[symb_i] == '\'')
-            temp_buffer[temp_i++] = buffer[symb_i];
-        else if ( isspace (buffer[symb_i]) && temp_i > 0 )
-        {
-            HT_Insert (ht_ptr, temp_buffer);
-            temp_i = 0L;
-            
-            memmove (temp_buffer, clean_buffer, 50);
-        }
-    }
-
-    if (temp_i != 0)
-        HT_Insert (ht_ptr, temp_buffer);
-
-    return NO_ERRORS;
-}
-
-int HT_Fill (struct Hash_Table *ht_ptr, const char *file_name)
-{
-    MY_ASSERT (ht_ptr, "struct Hash_Table *ht_ptr", NULL_PTR, ERROR);
-
-    FILE *file = Open_File (file_name, "rb");
-
-    long n_symbs = Define_File_Size (file);
-
-    char *buffer = Make_Buffer (file, n_symbs);
-
-    Close_File (file, file_name);
-
-    Divide_In_Words (ht_ptr, buffer, n_symbs);
-
-    return NO_ERRORS;
-}
-
-//***********************************************************************************************//
