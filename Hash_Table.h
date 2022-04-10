@@ -8,7 +8,7 @@
 
 #include "../../C/My_Lib/My_Lib.h"
 
-#define DEBUG 0
+#define DEBUG 1
 
 #if DEBUG == 0
 #undef MY_ASSERT
@@ -21,13 +21,6 @@ struct Node
     struct Node *next;
 };
 
-struct Hash_Table
-{
-    struct Node **array;
-    uint32_t (* hash_func)(const char *);
-    uint32_t size;
-};
-
 enum Hash_Func
 {
     CRINGE_1,
@@ -36,6 +29,14 @@ enum Hash_Func
     CHECKSUM,
     DED_HASH,
     SHA_256
+};
+
+struct Hash_Table
+{
+    struct Node **array;
+    uint32_t (* hash_func)(const char *);
+    enum Hash_Func hash_func_name;
+    uint32_t size;
 };
 
 struct Pair
@@ -49,6 +50,7 @@ enum Status
     NOT_FOUND = -1
 };
 
+// In Basic
 struct Hash_Table *HT_Ctor (enum Hash_Func function, uint32_t ht_size);
 int                HT_Dtor (struct Hash_Table *ht_ptr);
 
@@ -56,8 +58,12 @@ int         HT_Insert (struct Hash_Table *ht_ptr, const char *data);
 int         HT_Delete (struct Hash_Table *ht_ptr, const char *data);
 struct Pair HT_Search (const struct Hash_Table *ht_ptr, const char *data);
 
+// In Dump
 int HT_Dump (const struct Hash_Table *ht_ptr);
 
+// In Hash_Research
 int HT_Fill (struct Hash_Table *ht_ptr, const char *file_name);
+int *HT_Count_Collisions (const struct Hash_Table *ht_ptr);
+int HT_Print_Collisons (const struct Hash_Table *ht_ptr);
 
 #endif
