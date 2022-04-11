@@ -12,4 +12,4 @@ callgrind.out.*
 
 *.dot
 
-*.png
+Dump/Dump.png
