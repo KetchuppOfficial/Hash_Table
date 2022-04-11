@@ -6,7 +6,7 @@ int main (void)
     OPEN_LOG_FILE;
     #endif
     
-    struct Hash_Table *ht_ptr = HT_Ctor (ASCII_HASH, 100);
+    struct Hash_Table *ht_ptr = HT_Ctor (SHA_256, 20);
 
     HT_Fill (ht_ptr, "Hash_Research/Test.txt");
 

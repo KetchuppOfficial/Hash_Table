@@ -6,24 +6,24 @@
 //************************************************************************************************//
 
 //-----------------------------------------------------------------------------
-static uint32_t Cringe_1 (const char *data)
+static uint64_t Cringe_1 (const char *data)
 {
     return 1;
 }
 
-static uint32_t ASCII_Hash (const char *data)
+static uint64_t ASCII_Hash (const char *data)
 {
-    return (uint32_t)data[0];
+    return (uint64_t)data[0];
 }
 
-static uint32_t Len_Hash (const char *data)
+static uint64_t Len_Hash (const char *data)
 {
     return strlen (data);
 }
 
-static uint32_t Checksum (const char *data)
+static uint64_t Checksum (const char *data)
 {
-    uint32_t checksum = 0U;
+    uint64_t checksum = 0U;
     
     for (int i = 0; data[i] != '\0'; i++)
         checksum += data[i];
@@ -31,14 +31,14 @@ static uint32_t Checksum (const char *data)
     return checksum;
 }
 
-static inline uint32_t rotr (uint32_t num, uint32_t shift)
+static inline uint64_t rotr (uint64_t num, uint64_t shift)
 {
     return (num >> shift) | (num << (32 - shift));
 }
 
-static uint32_t Ded_Hash (const char *data)
+static uint64_t Ded_Hash (const char *data)
 {
-    uint32_t hash = data[0];
+    uint64_t hash = data[0];
 
     for (int i = 0; data[i] != '\0'; i++)
         hash = rotr (hash, 1) ^ data[i + 1];
@@ -47,7 +47,7 @@ static uint32_t Ded_Hash (const char *data)
 }
 //-----------------------------------------------------------------------------
 
-struct Hash_Table *HT_Ctor (enum Hash_Func function, uint32_t ht_size)
+struct Hash_Table *HT_Ctor (enum Hash_Func function, uint64_t ht_size)
 {
     struct Hash_Table *ht_ptr = (struct Hash_Table *)calloc (1, sizeof (struct Hash_Table));
     MY_ASSERT (ht_ptr, "struct Hash_Table *ht_ptr", NE_MEM, NULL);
@@ -85,7 +85,7 @@ struct Hash_Table *HT_Ctor (enum Hash_Func function, uint32_t ht_size)
             break;
 
         case SHA_256:
-            ht_ptr->hash_func = sha_256_32;
+            ht_ptr->hash_func = sha_256_64;
             ht_ptr->hash_func_name = SHA_256;
             break;
     
@@ -124,7 +124,7 @@ int HT_Dtor (struct Hash_Table *ht_ptr)
 {
     MY_ASSERT (ht_ptr, "struct Hash_Table *ht_ptr", NULL_PTR, ERROR);
     
-    for (uint32_t i = 0; i < ht_ptr->size; i++)
+    for (uint64_t i = 0; i < ht_ptr->size; i++)
     {
         if (ht_ptr->array[i] == NULL)
             continue;
@@ -167,7 +167,7 @@ int HT_Insert (struct Hash_Table *ht_ptr, const char *data)
     MY_ASSERT (ht_ptr, "struct Hash_Table *ht_ptr", NULL_PTR, ERROR);
     MY_ASSERT (data,   "const char *data",          NULL_PTR, ERROR);
 
-    uint32_t hash = (* ht_ptr->hash_func)(data);
+    uint64_t hash = (* ht_ptr->hash_func)(data);
     if (hash > ht_ptr->size - 1)
         hash = hash % ht_ptr->size;
 
@@ -214,7 +214,7 @@ struct Pair HT_Search (const struct Hash_Table *ht_ptr, const char *data)
     MY_ASSERT (data,   "const char *data",                NULL_PTR, (struct Pair)ERROR);
     #endif
     
-    uint32_t hash = (* ht_ptr->hash_func)(data);
+    uint64_t hash = (* ht_ptr->hash_func)(data);
     if (hash > ht_ptr->size - 1)
         hash = hash % ht_ptr->size;
 
@@ -248,7 +248,7 @@ struct Pair HT_Search (const struct Hash_Table *ht_ptr, const char *data)
     }
 }
 
-static inline void Delete_Beg_ (struct Hash_Table *ht_ptr, const uint32_t hash, struct Node *current)
+static inline void Delete_Beg_ (struct Hash_Table *ht_ptr, const uint64_t hash, struct Node *current)
 {
     ht_ptr->array[hash] = (current->next == NULL) ? NULL : current->next;
 
@@ -276,7 +276,7 @@ int HT_Delete (struct Hash_Table *ht_ptr, const char *data)
     MY_ASSERT (ht_ptr, "struct Hash_Table *ht_ptr", NULL_PTR, ERROR);
     MY_ASSERT (data,   "const char *data",          NULL_PTR, ERROR);
 
-    uint32_t hash = (* ht_ptr->hash_func)(data);
+    uint64_t hash = (* ht_ptr->hash_func)(data);
     if (hash > ht_ptr->size - 1)
         hash = hash % ht_ptr->size;
 

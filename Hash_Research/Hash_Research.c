@@ -77,7 +77,7 @@ int *HT_Count_Collisions (const struct Hash_Table *ht_ptr)
     int *collision_arr = (int *)calloc (ht_ptr->size, sizeof (int));
     MY_ASSERT (collision_arr, "int *collision_arr", NE_MEM, NULL);
     
-    for (uint32_t cell_i = 0; cell_i < ht_ptr->size; cell_i++)
+    for (uint64_t cell_i = 0; cell_i < ht_ptr->size; cell_i++)
     {
         if (ht_ptr->array[cell_i] != NULL)
         {
@@ -149,7 +149,7 @@ int HT_Print_Collisons (const struct Hash_Table *ht_ptr)
 
     FILE *file = Open_File (file_name, "wb");
     
-    for (uint32_t cell_i = 0; cell_i < ht_ptr->size; cell_i++)
+    for (uint64_t cell_i = 0; cell_i < ht_ptr->size; cell_i++)
         fprintf (file, "%d\n", collision_arr[cell_i]);
 
     Close_File (file, file_name);

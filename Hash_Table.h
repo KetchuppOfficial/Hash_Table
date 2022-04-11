@@ -34,14 +34,14 @@ enum Hash_Func
 struct Hash_Table
 {
     struct Node **array;
-    uint32_t (* hash_func)(const char *);
+    uint64_t (* hash_func)(const char *);
     enum Hash_Func hash_func_name;
-    uint32_t size;
+    uint64_t size;
 };
 
 struct Pair
 {
-    uint32_t hash;
+    uint64_t hash;
     int node_i;
 };
 
@@ -51,7 +51,7 @@ enum Status
 };
 
 // In Basic
-struct Hash_Table *HT_Ctor (enum Hash_Func function, uint32_t ht_size);
+struct Hash_Table *HT_Ctor (enum Hash_Func function, uint64_t ht_size);
 int                HT_Dtor (struct Hash_Table *ht_ptr);
 
 int         HT_Insert (struct Hash_Table *ht_ptr, const char *data);
