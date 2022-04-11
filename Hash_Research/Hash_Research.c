@@ -20,15 +20,19 @@ static int Divide_In_Words (struct Hash_Table *ht_ptr, const char *buffer, const
             temp_buffer[temp_i++] = buffer[symb_i];
         else if ( isspace (buffer[symb_i]) && temp_i > 0 )
         {
-            #if DEBUG == 0
-            HT_Insert (ht_ptr, temp_buffer);
-            #elif DEBUG == 1
-            int ret_val = HT_Insert (ht_ptr, temp_buffer);
-            MY_ASSERT (ret_val == NO_ERRORS, "HT_Insert ()", FUNC_ERROR, ERROR);
-            #endif
+            struct Pair pair = HT_Search (ht_ptr, temp_buffer);
+
+            if (pair.node_i == NOT_FOUND)
+            {
+                #if DEBUG == 0
+                HT_Insert (ht_ptr, temp_buffer);
+                #elif DEBUG == 1
+                int ret_val = HT_Insert (ht_ptr, temp_buffer);
+                MY_ASSERT (ret_val == NO_ERRORS, "HT_Insert ()", FUNC_ERROR, ERROR);
+                #endif
+            }
 
             temp_i = 0L;
-            
             memmove (temp_buffer, clean_buffer, 50);
         }
     }
@@ -150,7 +154,7 @@ int HT_Print_Collisons (const struct Hash_Table *ht_ptr)
     FILE *file = Open_File (file_name, "wb");
     
     for (uint64_t cell_i = 0; cell_i < ht_ptr->size; cell_i++)
-        fprintf (file, "%d\n", collision_arr[cell_i]);
+        fprintf (file, "%lu\t %d\n", cell_i, collision_arr[cell_i]);
 
     Close_File (file, file_name);
 
