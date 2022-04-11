@@ -1,5 +1,4 @@
 #include "Hash_Table.h"
-#include "../../C/SHA_256/sha_256.h"
 
 //************************************************************************************************//
 //                           CONSTRUCTORS, DESTRUCTORS AND HASH FUNCTIONS                         //
@@ -33,14 +32,14 @@ static uint64_t Checksum (const char *data)
 
 static inline uint64_t rotr (uint64_t num, uint64_t shift)
 {
-    return (num >> shift) | (num << (32 - shift));
+    return (num >> shift) | (num << (64 - shift));
 }
 
 static uint64_t Ded_Hash (const char *data)
 {
     uint64_t hash = data[0];
 
-    for (int i = 0; data[i] != '\0'; i++)
+    for (int i = 0; data[i + 1] != '\0'; i++)
         hash = rotr (hash, 1) ^ data[i + 1];
 
     return hash;

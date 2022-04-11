@@ -6,6 +6,8 @@
 #include <string.h>
 #include <ctype.h>
 
+#include "../../C/SHA_256/sha_256.h"
+
 #include "../../C/My_Lib/My_Lib.h"
 
 #define DEBUG 1
