@@ -39,8 +39,8 @@ static uint64_t Ded_Hash (const char *data)
 {
     uint64_t hash = data[0];
 
-    for (int i = 0; data[i + 1] != '\0'; i++)
-        hash = rotr (hash, 1) ^ data[i + 1];
+    for (int i = 0; data[i] != '\0'; i++)
+        hash = rotr (hash, 1) ^ data[i];
 
     return hash;
 }
@@ -167,6 +167,7 @@ int HT_Insert (struct Hash_Table *ht_ptr, const char *data)
     MY_ASSERT (data,   "const char *data",          NULL_PTR, ERROR);
 
     uint64_t hash = (* ht_ptr->hash_func)(data);
+
     if (hash > ht_ptr->size - 1)
         hash = hash % ht_ptr->size;
 
