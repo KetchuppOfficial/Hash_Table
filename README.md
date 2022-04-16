@@ -4,6 +4,12 @@
 2. [Building](#building)
 3. [Dependencies](#dependencies)
 4. [Hash functions research](#hash-functions-research)
+    1. [Cringe_1](##cringe-1)
+    2. [ASCII_Hash](##ascii-hash)
+    3. [Len_Hash](##len-hash)
+    4. [Checksum](##checksum)
+    5. [Ded_Hash](##ded-hash)
+    6. [SHA_256](##sha-256)
 
 # General information
 
@@ -142,9 +148,9 @@ static uint64_t Checksum (const char *data)
     return checksum;
 }
 ```
-**Hash table size:** 4096 cells. 
+**Hash table size:** 2048 cells. 
 
-Three previous function was a kind of joke and shouldn't be treated seriously. Since *Checksum ()* hash function are *real*, if it can be said this way. Here and further the size of the hash table is 4096 cells. If an ideal hash function is used, there will be approximatelly 14 words in each cell.
+Three previous function was a kind of joke and shouldn't be treated seriously. Since *Checksum ()* hash function are *real*, if it can be said this way. Here and further the size of the hash table is 2048 cells. If an ideal hash function is used, there will be approximatelly 11.4 words in each cell.
 
 ![Checksum](https://github.com/KetchuppOfficial/Hash_Table/blob/master/Hash_Research/CHECKSUM.png)
 
@@ -170,11 +176,11 @@ static uint64_t Ded_Hash (const char *data)
 
 **Hash table size:** 2048 cells
 
-![Ded_Hash_2048](https://github.com/KetchuppOfficial/Hash_Table/blob/master/Hash_Research/DED_HASH.png)
+![Ded_Hash_2048](https://github.com/KetchuppOfficial/Hash_Table/blob/master/Hash_Research/DED_HASH_2048.png)
 
 **Hash table size:** 2047 cells
 
-![Ded_Hash_2047]()
+![Ded_Hash_2047](https://github.com/KetchuppOfficial/Hash_Table/blob/master/Hash_Research/DED_HASH_2047.png)
 
 You can see that **Ded_Hash** is not good to use if the size of a hash table is multiple of 2.
 
@@ -182,6 +188,6 @@ You can see that **Ded_Hash** is not good to use if the size of a hash table is 
 
 Implementation of this function can be seen on the GitHub page of my SHA-256.
 
-**Hash table size:** 4096 cells
+**Hash table size:** 2048 cells
 
 ![SHA_256](https://github.com/KetchuppOfficial/Hash_Table/blob/master/Hash_Research/SHA_256.png)
