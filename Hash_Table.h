@@ -5,12 +5,11 @@
 #include <inttypes.h>
 #include <string.h>
 #include <ctype.h>
+#include <time.h>
 
 #include "../../C/SHA_256/sha_256.h"
 
 #include "../../C/My_Lib/My_Lib.h"
-
-#define DEBUG 1
 
 #if DEBUG == 0
 #undef MY_ASSERT
