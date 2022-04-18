@@ -33,7 +33,7 @@ static int Divide_In_Words (struct Hash_Table *ht_ptr, const char *buffer, const
             }
 
             temp_i = 0L;
-            memmove (temp_buffer, clean_buffer, 50);
+            memcpy (temp_buffer, clean_buffer, 50);
         }
     }
 
@@ -71,6 +71,8 @@ int HT_Fill (struct Hash_Table *ht_ptr, const char *file_name)
     MY_ASSERT (ret_val != ERROR, "Divide_In_Words ()", FUNC_ERROR, ERROR);
     #endif
 
+    free (buffer);
+
     return NO_ERRORS;
 }
 
@@ -102,46 +104,46 @@ int *HT_Count_Collisions (const struct Hash_Table *ht_ptr)
     return collision_arr;
 }
 
-static const char names_arr[][29] = 
+static const char names_arr[][32] = 
 {
-    "Hash_Research/Cringe_1.txt",
-    "Hash_Research/ASCII_Hash.txt",
-    "Hash_Research/Len_Hash.txt",
-    "Hash_Research/Checksum.txt",
-    "Hash_Research/Ded_Hash.txt",
-    "Hash_Research/Sha_256.txt",
+    "../Hash_Research/Cringe_1.txt",
+    "../Hash_Research/ASCII_Hash.txt",
+    "../Hash_Research/Len_Hash.txt",
+    "../Hash_Research/Checksum.txt",
+    "../Hash_Research/Ded_Hash.txt",
+    "../Hash_Research/Sha_256.txt",
 };
 
 int HT_Print_Collisons (const struct Hash_Table *ht_ptr)
 {
     MY_ASSERT (ht_ptr, "const Hash_Table *ht_ptr", NULL_PTR, ERROR);
     
-    char file_name[29] =  "";
+    char file_name[32] = "";
 
     switch (ht_ptr->hash_func_name)
     {
         case CRINGE_1:
-            memmove (file_name, names_arr[CRINGE_1],   sizeof names_arr[CRINGE_1]);
+            memcpy (file_name, names_arr[CRINGE_1],   sizeof names_arr[CRINGE_1]);
             break;
 
         case ASCII_HASH:
-            memmove (file_name, names_arr[ASCII_HASH], sizeof names_arr[ASCII_HASH]);
+            memcpy (file_name, names_arr[ASCII_HASH], sizeof names_arr[ASCII_HASH]);
             break;
 
         case LEN_HASH:
-            memmove (file_name, names_arr[LEN_HASH],   sizeof names_arr[LEN_HASH]);
+            memcpy (file_name, names_arr[LEN_HASH],   sizeof names_arr[LEN_HASH]);
             break;
 
         case CHECKSUM:
-            memmove (file_name, names_arr[CHECKSUM],   sizeof names_arr[CHECKSUM]);
+            memcpy (file_name, names_arr[CHECKSUM],   sizeof names_arr[CHECKSUM]);
             break;
         
         case DED_HASH:
-            memmove (file_name, names_arr[DED_HASH],   sizeof names_arr[DED_HASH]);
+            memcpy (file_name, names_arr[DED_HASH],   sizeof names_arr[DED_HASH]);
             break;
 
         case SHA_256:
-            memmove (file_name, names_arr[SHA_256],    sizeof names_arr[SHA_256]);
+            memcpy (file_name, names_arr[SHA_256],    sizeof names_arr[SHA_256]);
             break;
     
         default:
@@ -150,9 +152,10 @@ int HT_Print_Collisons (const struct Hash_Table *ht_ptr)
 
     int *collision_arr = HT_Count_Collisions (ht_ptr);
     MY_ASSERT (collision_arr, "HT_Count_Collisions ()", FUNC_ERROR, ERROR);
-
-    FILE *file = Open_File (file_name, "wb");
     
+    FILE *file = Open_File (file_name, "wb");
+    MY_ASSERT (file, "FILE *file", NULL_PTR, ERROR);
+
     for (uint64_t cell_i = 0; cell_i < ht_ptr->size; cell_i++)
         fprintf (file, "%lu\t %d\n", cell_i, collision_arr[cell_i]);
 

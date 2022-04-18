@@ -7,9 +7,12 @@
 #include <ctype.h>
 #include <time.h>
 
-#include "../../C/SHA_256/sha_256.h"
+#define DEBUG 1
+#define DUMP 0
 
-#include "../../C/My_Lib/My_Lib.h"
+#include "../../SHA_256/sha_256.h"
+
+#include "../../My_Lib/My_Lib.h"
 
 #if DEBUG == 0
 #undef MY_ASSERT
@@ -20,6 +23,7 @@ struct Node
 {
     char *data;
     struct Node *next;
+    size_t len;
 };
 
 enum Hash_Func
@@ -36,8 +40,8 @@ struct Hash_Table
 {
     struct Node **array;
     uint64_t (* hash_func)(const char *);
-    enum Hash_Func hash_func_name;
     uint64_t size;
+    enum Hash_Func hash_func_name;
 };
 
 struct Pair

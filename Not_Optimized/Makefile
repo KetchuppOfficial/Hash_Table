@@ -1,11 +1,11 @@
 CC = gcc
-CFLAGS = -c -Wall -Werror
+CFLAGS = -c -Wall -Werror -Wshadow -Wfloat-equal -Wswitch-default
 
-SHA_LIB = ../../C/SHA_256/sha_256.a
-MY_LIB  = ../../C/My_Lib/My_Lib.a
+SHA_LIB = ../../../SHA_256/sha_256.a
+MY_LIB  = ../../../My_Lib/My_Lib.a
 
-DUMP = Dump/
-RSRCH = Hash_Research/
+DUMP = ../Dump/
+RSRCH = ../Hash_Research/
 
 all: Hash_Table
 
@@ -17,7 +17,7 @@ Hash_Table: main.o Hash_Table.o Hash_Table_Dump.o Hash_Table_Reasearch.o
 	rm $(RSRCH)Hash_Research.o
 
 main.o:
-	$(CC) $(CFLAGS) main.c -o main.o
+	$(CC) $(CFLAGS) ../main.c -o main.o
 
 Hash_Table.o:
 	$(CC) $(CFLAGS) Hash_Table.c -o Hash_Table.o
@@ -33,9 +33,9 @@ run:
 
 clean:
 	rm Hash_Table.out
-	rm log_file.log
+	rm -f log_file.log
 
 callgrind:
 	valgrind --tool=callgrind ./Hash_Table.out
-	callgrind_annotate callgrind.out.* --tree=both > Optimization/callgrind.txt
+	kcachegrind
 	rm callgrind.out.*

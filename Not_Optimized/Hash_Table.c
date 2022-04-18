@@ -1,4 +1,4 @@
-#include "Hash_Table.h"
+#include "../Hash_Table.h"
 
 //************************************************************************************************//
 //                           CONSTRUCTORS, DESTRUCTORS AND HASH FUNCTIONS                         //
@@ -59,32 +59,32 @@ struct Hash_Table *HT_Ctor (enum Hash_Func function, uint64_t ht_size)
     switch (function)
     {
         case CRINGE_1:
-            ht_ptr->hash_func = Cringe_1;
+            ht_ptr->hash_func      = Cringe_1;
             ht_ptr->hash_func_name = CRINGE_1;
             break;
 
         case ASCII_HASH:
-            ht_ptr->hash_func = ASCII_Hash;
+            ht_ptr->hash_func      = ASCII_Hash;
             ht_ptr->hash_func_name = ASCII_HASH;
             break;
 
         case LEN_HASH:
-            ht_ptr->hash_func = Len_Hash;
+            ht_ptr->hash_func      = Len_Hash;
             ht_ptr->hash_func_name = LEN_HASH;
             break;
 
         case CHECKSUM:
-            ht_ptr->hash_func = Checksum;
+            ht_ptr->hash_func      = Checksum;
             ht_ptr->hash_func_name = CHECKSUM;
             break;
         
         case DED_HASH:
-            ht_ptr->hash_func = Ded_Hash;
+            ht_ptr->hash_func      = Ded_Hash;
             ht_ptr->hash_func_name = DED_HASH;
             break;
 
         case SHA_256:
-            ht_ptr->hash_func = sha_256_64;
+            ht_ptr->hash_func      = sha_256_64;
             ht_ptr->hash_func_name = SHA_256;
             break;
     
@@ -125,9 +125,7 @@ int HT_Dtor (struct Hash_Table *ht_ptr)
     
     for (uint64_t i = 0; i < ht_ptr->size; i++)
     {
-        if (ht_ptr->array[i] == NULL)
-            continue;
-        else
+        if (ht_ptr->array[i] != NULL)
             List_Dtor (ht_ptr->array[i]);
     }
 
@@ -153,10 +151,11 @@ static struct Node *Add_Node (const char *data)
     char *str = (char *)calloc (len, sizeof (char));
     MY_ASSERT (str, "char *str", NE_MEM, NULL);
 
-    memmove (str, data, len);
+    memcpy (str, data, len);
 
     new_node->next = NULL;
     new_node->data = str;
+    new_node->len  = len - 1;
 
     return new_node;
 }
@@ -229,7 +228,7 @@ struct Pair HT_Search (const struct Hash_Table *ht_ptr, const char *data)
 
         for (pair.node_i = 0; next != NULL; pair.node_i++)
         {
-            if (strcmp (current->data, data) == 0)
+            if (memcmp (current->data, data, current->len) == 0)
                 return pair;
             else
             {
@@ -238,7 +237,7 @@ struct Pair HT_Search (const struct Hash_Table *ht_ptr, const char *data)
             }
         }
 
-        if (strcmp (current->data, data) == 0)
+        if (memcmp (current->data, data, current->len) == 0)
             return pair;
         else
         {
@@ -292,7 +291,7 @@ int HT_Delete (struct Hash_Table *ht_ptr, const char *data)
 
         for (pair.node_i = 0; next != NULL; pair.node_i++)
         {
-            if (strcmp (current->data, data) == 0)
+            if (memcmp (current->data, data, current->len) == 0)
             {               
                 if (pair.node_i == 0)
                     Delete_Beg_ (ht_ptr, hash, current);
@@ -309,7 +308,7 @@ int HT_Delete (struct Hash_Table *ht_ptr, const char *data)
             }
         }
 
-        if (strcmp (current->data, data) == 0)
+        if (memcmp (current->data, data, current->len) == 0)
         {
             if (pair.node_i == 0)
                 Delete_Beg_ (ht_ptr, hash, current);

@@ -7,6 +7,7 @@
 TODO
 
 *.txt
+!The Lord of the Rings.txt
 
 callgrind.out.*
 
