@@ -49,7 +49,7 @@ enum Status
 };
 
 // In Basic
-struct Hash_Table *HT_Ctor (enum Hash_Func function, uint64_t ht_size);
+struct Hash_Table *HT_Ctor (enum Hash_Func function, const uint64_t ht_size);
 int                HT_Dtor (struct Hash_Table *ht_ptr);
 
 int HT_Insert (struct Hash_Table *ht_ptr, const char *const data);
