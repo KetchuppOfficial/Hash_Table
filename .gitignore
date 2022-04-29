@@ -16,8 +16,6 @@ callgrind.out.*
 
 # Not for release
 #~~~~~~~~~~~~~~~~
-Dump/Dump.png
-
 Test/
 
 TODO
