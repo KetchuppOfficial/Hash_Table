@@ -64,8 +64,10 @@ static uint64_t Ded_Hash (const char *data)
 //                                  CONSTRUCTORS AND DESTRUCTORS                                  //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 
-struct Hash_Table *HT_Ctor (enum Hash_Func function, uint64_t ht_size)
+struct Hash_Table *HT_Ctor (enum Hash_Func function, const uint64_t ht_size)
 {
+    MY_ASSERT (ht_size > 0, "const uint64_t ht_size", POS_VAL, NULL);
+    
     struct Hash_Table *ht_ptr = (struct Hash_Table *)calloc (1, sizeof (struct Hash_Table));
     MY_ASSERT (ht_ptr, "struct Hash_Table *ht_ptr", NE_MEM, NULL);
 
@@ -218,7 +220,7 @@ void HT_Insert (struct Hash_Table *ht_ptr, const char *data)
         while (next != NULL)
         {
             current = next;
-            next = current->next;
+            next    = current->next;
         }
 
         current->next = Add_Node (data);

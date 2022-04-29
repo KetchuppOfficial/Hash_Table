@@ -1,9 +1,4 @@
 /*
-    DESCRIPTION
-    ~~~~~~~~~~~
-
-    There are no optimizations here
-
     291 382 650 clock signals
 */
 
