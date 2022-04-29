@@ -10,6 +10,7 @@
     4. [Checksum](##checksum)
     5. [Ded_Hash](##ded-hash)
     6. [SHA_256](##sha-256)
+5. [Hash table optimizaton](#hash-table-optimization)
 
 # General information
 
@@ -148,9 +149,9 @@ static uint64_t Checksum (const char *data)
     return checksum;
 }
 ```
-**Hash table size:** 2048 cells. 
+**Hash table size:** 2000 cells. 
 
-Three previous function was a kind of joke and shouldn't be treated seriously. Since *Checksum ()* hash function are *real*, if it can be said this way. Here and further the size of the hash table is 2048 cells. If an ideal hash function is used, there will be approximatelly 11.4 words in each cell.
+Three previous function was a kind of joke and shouldn't be treated seriously. Since *Checksum ()* hash function are *real*, if it can be said this way. Here and further the size of the hash table is 2000 cells. The load factor is approximately 8,24 as there are 16485 words in the hash table.
 
 ![Checksum](Hash_Research/CHECKSUM.png)
 
@@ -158,7 +159,7 @@ Three previous function was a kind of joke and shouldn't be treated seriously. S
 
 I was informed about this function by my teacher [Ded](https://github.com/ded32).
 ```C
-static inline uint64_t rotr (uint64_t num, uint64_t shift)
+static inline uint64_t ror(uint64_t num, uint64_t shift)
 {
     return (num >> shift) | (num << (64 - shift));
 }
@@ -168,26 +169,43 @@ static uint64_t Ded_Hash (const char *data)
     uint64_t hash = data[0];
 
     for (int i = 0; data[i] != '\0'; i++)
-        hash = rotr (hash, 1) ^ data[i];
+        hash = ror (hash, 1) ^ data[i];
 
     return hash;
 }
 ```
 
-**Hash table size:** 2048 cells
+**Hash table size:** 2000 cells
 
-![Ded_Hash_2048](Hash_Research/DED_HASH_2048.png)
-
-**Hash table size:** 2047 cells
-
-![Ded_Hash_2047](Hash_Research/DED_HASH_2047.png)
-
-You can see that **Ded_Hash** is not good to use if the size of a hash table is multiple of 2.
+![Ded_Hash](Hash_Research/DED_HASH.png)
 
 ## SHA-256
 
 Implementation of this function can be seen on the GitHub page of my SHA-256.
 
-**Hash table size:** 2048 cells
+**Hash table size:** 2000 cells
 
 ![SHA_256](Hash_Research/SHA_256.png)
+
+
+# Hash table optimization
+
+I used *callgrind* to get profiling data and *kcachegrind* to visualize it.
+
+## Version 0
+
+There are no optimizations in this version. It differs from hash table from [Not_Optimized](Not_Optimized) folder in some ways but these differences are minor (dump and counting collisions were removed, for example). It takes 291 382 650 clock signals to execute this program. Let's think how can we optimize hash table to make it work faster.
+
+As we see in the picture below, execution of *Divide_In_Words* takes the longest time. 
+
+![picture](Optimized/Version_0/Version_0.png)
+
+It seems logical to optimize this very function at first. Nevertheless, if we look at the callee map, we can see that *Divide_In_Words* calls *Insert_Words*. This function itself calls *HT_Search* and *HT_Inset*:
+
+![Insert_Words](Optimized/Version_0/Insert_Word.png)
+
+It looks like we've found a function to optimize. It should he *HT_Search*. But may we dig a little dipper and see which functions are called by *HT_Search*.
+
+![HT_Search](Optimized/Version_0/HT_Search.png)
+
+It turns out *HT_Search* calls *Ded_Hash* and some nonsense that is nothing else but *_strncmp_avx2* - a fast version of *strncmp* (well, not fast enough). We finally which functions are the slowest, so let's optimize them. I consider doing it gradually as a good idea. Firstly, we will optimize *Ded_Hash* and *strncmp* after that. Then we will see which optimization made the greatest contribution to speeding hash table up.
