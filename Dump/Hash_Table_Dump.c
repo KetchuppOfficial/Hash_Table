@@ -1,8 +1,16 @@
-#include "../Hash_Table.h"
+#include "../Not_Optimized/Hash_Table.h"
 
-//***********************************************************************************************//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+const char dump_file_dir[]  = "../Dump/";
+
+const char dot_file_name[]  = "Dump.dot";
+
+const char dump_file_name[] = "Dump.png";
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //                                              DUMP                                             //
-//***********************************************************************************************//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 
 static void Print_List (FILE *file, struct Node *node_ptr, const uint64_t cell_i)
 {
@@ -69,11 +77,33 @@ static void Print_Arrows (FILE *file, const struct Hash_Table *ht_ptr)
     }
 }
 
+static inline char *Make_File_Name (const char *dir, const char *name)
+{
+    char *path = (char *)calloc (strlen (dir) + strlen (name) + 1, sizeof (char));
+    strcpy (path, dir);
+    strcat (path, name);
+    
+    return path;
+}
+
+static inline char *Make_System_String (const char *dot, const char *img)
+{
+    char *string = (char *)calloc (15 + strlen (dot) + strlen (img), sizeof (char));
+
+    sprintf (string, "dot -Tpng %s -o %s", dot, img);
+
+    return string;
+}
+
 int HT_Dump (const struct Hash_Table *ht_ptr)
 {
-    MY_ASSERT (ht_ptr, "cosnt struct Hash_Table *ht_ptr", NULL_PTR, ERROR);
-    
-    FILE *file = Open_File ("Dump/Dump.dot", "wb");
+    MY_ASSERT (ht_ptr, "const struct Hash_Table *ht_ptr", NULL_PTR, ERROR);
+
+    char *dot_file_path  = Make_File_Name (dump_file_dir, dot_file_name);
+    char *dump_file_path = Make_File_Name (dump_file_dir, dump_file_name);
+
+    FILE *file = Open_File (dot_file_path, "wb");
+    MY_ASSERT (file, "Open_File ()", FUNC_ERROR, ERROR);
 
     fprintf (file, "digraph Hash_Table\n"
                          "{\n"
@@ -86,16 +116,20 @@ int HT_Dump (const struct Hash_Table *ht_ptr)
                                     "\t\tbgcolor = gray70;\n"
                                     "\t\trankdir = LR;\n\n", ht_ptr->size);
 
-    Print_HT (file, ht_ptr);
+    Print_HT     (file, ht_ptr);
     Print_Arrows (file, ht_ptr);
+    fprintf      (file, "\t}\n}\n");
 
-    fprintf (file, "\t}\n}\n");
+    Close_File (file, dot_file_path);
 
-    Close_File (file, "Dump/Dump.dot");
+    char *sys_string = Make_System_String (dot_file_path, dump_file_path);
+    system (sys_string);
 
-    system ("dot -Tpng Dump/Dump.dot -o Dump/Dump.png");
+    free (dot_file_path);
+    free (dump_file_path);
+    free (sys_string);
 
     return NO_ERRORS;
 }
 
-//***********************************************************************************************//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
