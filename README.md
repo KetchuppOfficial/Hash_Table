@@ -423,9 +423,8 @@ We succeded in accelerating the work of hash table. It took 291 382 650 clock si
 
 The result is that my optimization is relatively close to the result of gcc with any optimization flag. Let's calculate the most important coefficient that is widely known Ded_Coefficient.
 
-$Ded\_Coefficient = \frac{acceleration\ value}{number\ of\ assembly\
-lines}\cdot 1000$
+Ded_Coefficient = acceleration value / number of assembly lines * 1000
 
 We will count only instruction and won't count comments, labels or names of functions. Taking this into consideration, we find: Ded_Hash.s - 10 lines, HT_Search.s - 48 lines, Str_Cmp_SSE.s - 17 lines. All in all:
 
-$Ded\_Coefficient = \frac{43,2}{75}\cdot1000 = 576$
+Ded_Coefficient = 43,2 / 75*1000 = 576
