@@ -1,10 +1,9 @@
-#include "../Hash_Table.h"
+#include "Hash_Table.h"
 
-//************************************************************************************************//
-//                           CONSTRUCTORS, DESTRUCTORS AND HASH FUNCTIONS                         //
-//************************************************************************************************//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//                                         HASH FUNCTIONS                                         //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 
-//-----------------------------------------------------------------------------
 static uint64_t Cringe_1 (const char *data)
 {
     return 1;
@@ -30,7 +29,7 @@ static uint64_t Checksum (const char *data)
     return checksum;
 }
 
-static inline uint64_t rotr (uint64_t num, uint64_t shift)
+static inline uint64_t ror (uint64_t num, uint64_t shift)
 {
     return (num >> shift) | (num << (64 - shift));
 }
@@ -40,11 +39,15 @@ static uint64_t Ded_Hash (const char *data)
     uint64_t hash = data[0];
 
     for (int i = 0; data[i] != '\0'; i++)
-        hash = rotr (hash, 1) ^ data[i];
+        hash = ror (hash, 1) ^ data[i];
 
     return hash;
 }
-//-----------------------------------------------------------------------------
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//                                  CONSTRUCTORS AND DESTRUCTORS                                  //
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 
 struct Hash_Table *HT_Ctor (enum Hash_Func function, uint64_t ht_size)
 {
@@ -94,9 +97,7 @@ struct Hash_Table *HT_Ctor (enum Hash_Func function, uint64_t ht_size)
 
     return ht_ptr;
 }
-//-----------------------------------------------------------------------------
 
-//-----------------------------------------------------------------------------
 static int List_Dtor (struct Node *node_ptr)
 {
     MY_ASSERT (node_ptr, "struct Node *node_ptr", NULL_PTR, ERROR);
@@ -134,11 +135,11 @@ int HT_Dtor (struct Hash_Table *ht_ptr)
 
     return NO_ERRORS;
 }
-//***********************************************************************************************//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 
-//***********************************************************************************************//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //                                            INSERTION                                          //
-//***********************************************************************************************//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 
 static struct Node *Add_Node (const char *data)
 {
@@ -166,9 +167,7 @@ int HT_Insert (struct Hash_Table *ht_ptr, const char *data)
     MY_ASSERT (data,   "const char *data",          NULL_PTR, ERROR);
 
     uint64_t hash = (* ht_ptr->hash_func)(data);
-
-    if (hash > ht_ptr->size - 1)
-        hash = hash % ht_ptr->size;
+    hash = hash % ht_ptr->size;
 
     if (ht_ptr->array[hash] == NULL)
     {
@@ -199,37 +198,32 @@ int HT_Insert (struct Hash_Table *ht_ptr, const char *data)
 
     return NO_ERRORS;
 }
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 
-//*************************************************************************************************
-
-//***********************************************************************************************//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //                                     SEARCHING AND DELETING                                    //
-//***********************************************************************************************//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 
-struct Pair HT_Search (const struct Hash_Table *ht_ptr, const char *data)
+int HT_Search (const struct Hash_Table *ht_ptr, const char *const data)
 {
-    #if 0
-    MY_ASSERT (ht_ptr, "const struct Hash_Table *ht_ptr", NULL_PTR, (struct Pair)ERROR);
-    MY_ASSERT (data,   "const char *data",                NULL_PTR, (struct Pair)ERROR);
-    #endif
+    MY_ASSERT (ht_ptr, "const struct Hash_Table *ht_ptr", NULL_PTR, ERROR);
+    MY_ASSERT (data,   "const char *data",                NULL_PTR, ERROR);
     
     uint64_t hash = (* ht_ptr->hash_func)(data);
-    if (hash > ht_ptr->size - 1)
-        hash = hash % ht_ptr->size;
-
-    struct Pair pair = {hash, NOT_FOUND};
+    hash = hash % ht_ptr->size;
 
     if (ht_ptr->array[hash] == NULL)
-        return pair;
+        return NOT_FOUND;
     else
     {
         struct Node *current = ht_ptr->array[hash];
         struct Node *next    = current->next;
 
-        for (pair.node_i = 0; next != NULL; pair.node_i++)
-        {
-            if (memcmp (current->data, data, current->len) == 0)
-                return pair;
+        int node_i = 0;
+        for ( ; next != NULL; node_i++)
+        {           
+            if (memcmp (current->data, data, current->len + 1) == 0)
+                return node_i;
             else
             {
                 current = next;
@@ -237,13 +231,7 @@ struct Pair HT_Search (const struct Hash_Table *ht_ptr, const char *data)
             }
         }
 
-        if (memcmp (current->data, data, current->len) == 0)
-            return pair;
-        else
-        {
-            pair.node_i = NOT_FOUND;
-            return pair;
-        }
+        return (memcmp (current->data, data, current->len + 1) == 0) ? node_i : NOT_FOUND;
     }
 }
 
@@ -266,6 +254,7 @@ static inline void Delete_Mid_ (struct Node *prev, struct Node *current, struct 
 static inline void Delete_End_ (struct Node *prev, struct Node *current)
 {
     prev->next = NULL;
+    
     free (current->data);
     free (current);
 }
@@ -276,10 +265,7 @@ int HT_Delete (struct Hash_Table *ht_ptr, const char *data)
     MY_ASSERT (data,   "const char *data",          NULL_PTR, ERROR);
 
     uint64_t hash = (* ht_ptr->hash_func)(data);
-    if (hash > ht_ptr->size - 1)
-        hash = hash % ht_ptr->size;
-
-    struct Pair pair = {hash, NOT_FOUND};
+    hash = hash % ht_ptr->size;
 
     if (ht_ptr->array[hash] == NULL)
         return NOT_FOUND;
@@ -289,11 +275,12 @@ int HT_Delete (struct Hash_Table *ht_ptr, const char *data)
         struct Node *current = ht_ptr->array[hash];
         struct Node *next    = current->next;
 
-        for (pair.node_i = 0; next != NULL; pair.node_i++)
+        int node_i = 0;
+        for ( ; next != NULL; node_i++)
         {
-            if (memcmp (current->data, data, current->len) == 0)
+            if (memcmp (current->data, data, current->len + 1) == 0)
             {               
-                if (pair.node_i == 0)
+                if (node_i == 0)
                     Delete_Beg_ (ht_ptr, hash, current);
                 else
                     Delete_Mid_ (prev, current, next);
@@ -308,9 +295,9 @@ int HT_Delete (struct Hash_Table *ht_ptr, const char *data)
             }
         }
 
-        if (memcmp (current->data, data, current->len) == 0)
+        if (memcmp (current->data, data, current->len + 1) == 0)
         {
-            if (pair.node_i == 0)
+            if (node_i == 0)
                 Delete_Beg_ (ht_ptr, hash, current);
             else
                 Delete_End_ (prev, current);
@@ -320,5 +307,4 @@ int HT_Delete (struct Hash_Table *ht_ptr, const char *data)
             return NOT_FOUND;
     }
 }
-
-//*************************************************************************************************
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
