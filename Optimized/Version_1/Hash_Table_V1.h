@@ -54,7 +54,7 @@ void HT_Fill   (struct Hash_Table *ht_ptr, const char *file_name);
 
 #endif
 
-struct Hash_Table *HT_Ctor (enum Hash_Func function, uint64_t ht_size);
+struct Hash_Table *HT_Ctor (enum Hash_Func function, const uint64_t ht_size);
 int HT_Search              (const struct Hash_Table *ht_ptr, const char *const data);
 int HT_Delete              (struct Hash_Table *ht_ptr, const char *const data);
 #endif

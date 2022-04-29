@@ -52,8 +52,10 @@ uint64_t Ded_Hash (const char *data);
 //                                  CONSTRUCTORS AND DESTRUCTORS                                  //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 
-struct Hash_Table *HT_Ctor (enum Hash_Func function, uint64_t ht_size)
+struct Hash_Table *HT_Ctor (enum Hash_Func function, const uint64_t ht_size)
 {
+    MY_ASSERT (ht_size > 0, "const uint64_t ht_size", POS_VAL, NULL);
+    
     struct Hash_Table *ht_ptr = (struct Hash_Table *)calloc (1, sizeof (struct Hash_Table));
     MY_ASSERT (ht_ptr, "struct Hash_Table *ht_ptr", NE_MEM, NULL);
 
@@ -209,7 +211,7 @@ void HT_Insert (struct Hash_Table *ht_ptr, const char *data)
         while (next != NULL)
         {
             current = next;
-            next = current->next;
+            next    = current->next;
         }
 
         current->next = Add_Node (data);
@@ -228,13 +230,6 @@ void HT_Insert (struct Hash_Table *ht_ptr, const char *data)
 //***********************************************************************************************//
 //                                     SEARCHING AND DELETING                                    //
 //***********************************************************************************************//
-enum STR_CMP
-{
-    EQUAL,
-    NOT_EQUAL
-};
-
-extern int Str_Cmp_Align16 (const char *const str_1, const char *const str_2, const size_t len);
 
 int HT_Search (const struct Hash_Table *ht_ptr, const char *const data)
 {
@@ -254,7 +249,7 @@ int HT_Search (const struct Hash_Table *ht_ptr, const char *const data)
         int node_i = 0;
         for ( ; next != NULL; node_i++)
         {           
-            if (strncmp (current->str, data, current->len + 1) == EQUAL)
+            if (strncmp (current->str, data, current->len + 1) == 0)
                 return node_i;
             else
             {
@@ -263,7 +258,7 @@ int HT_Search (const struct Hash_Table *ht_ptr, const char *const data)
             }
         }
 
-        return (strncmp (current->str, data, current->len + 1) == EQUAL) ? node_i : NOT_FOUND;
+        return (strncmp (current->str, data, current->len + 1) == 0) ? node_i : NOT_FOUND;
     }
 }
 
@@ -310,7 +305,7 @@ int HT_Delete (struct Hash_Table *ht_ptr, const char *data)
         int node_i = 0;
         for ( ; next != NULL; node_i++)
         {
-            if (strncmp (current->str, data, current->len + 1) == EQUAL)
+            if (strncmp (current->str, data, current->len + 1) == 0)
             {               
                 if (node_i == 0)
                     Delete_Beg_ (ht_ptr, hash, current);
@@ -327,7 +322,7 @@ int HT_Delete (struct Hash_Table *ht_ptr, const char *data)
             }
         }
         
-        if (strncmp (current->str, data, current->len + 1) == EQUAL)
+        if (strncmp (current->str, data, current->len + 1) == 0)
         {
             if (node_i == 0)
                 Delete_Beg_ (ht_ptr, hash, current);

@@ -1,10 +1,5 @@
 /*
-    DESCRIPTION
-    ~~~~~~~~~~~
-
-    Hash function Ded_Hash () was implemented in the assembly language
-
-    229 246 310 clock signals
+    220 307 740 clock signals
 */
 
 #include "Hash_Table_V1.h"
