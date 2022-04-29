@@ -1,16 +1,27 @@
+# Service files
+#~~~~~~~~~~~~~
 *.out
 
 *.o
 
 *.log
 
-TODO
-
-*.txt
-!The Lord of the Rings.txt
-
 callgrind.out.*
 
 *.dot
 
+*.txt
+!The Lord of the Rings.txt
+#~~~~~~~~~~~~~
+
+# Not for release
+#~~~~~~~~~~~~~~~~
 Dump/Dump.png
+
+Test/
+
+TODO
+
+strncmp.s
+Ded_Hash_Asm.s
+#~~~~~~~~~~~~~~~~
