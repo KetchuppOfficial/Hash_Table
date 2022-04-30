@@ -38,17 +38,19 @@ $ make
 ```
 If building ended well you'll see a similar message:
 ```bash
-ketchupp@LAPTOP-LS9003PM:/mnt/d/Programming/Assembler/Hash_Table$ make
-gcc -c -Wall -Werror main.c -o main.o
-gcc -c -Wall -Werror Hash_Table.c -o Hash_Table.o
-gcc -c -Wall -Werror Dump/Hash_Table_Dump.c -o Dump/Hash_Table_Dump.o
-gcc -c -Wall -Werror Hash_Research/Hash_Research.c -o Hash_Research/Hash_Research.o
-gcc main.o Hash_Table.o Dump/Hash_Table_Dump.o Hash_Research/Hash_Research.o ../../C/SHA_256/sha_256.a ../../C/My_Lib/My_Lib.a -o Hash_Table.out
+ketchupp@ketchupp-HVY-WXX9:~/Programming/Semester_2/Hash_Table/Not_Optimized$ make
+gcc -c -g -Wall -Werror -Wshadow -Wfloat-equal -Wswitch-default main.c  -o main.o
+gcc -c -g -Wall -Werror -Wshadow -Wfloat-equal -Wswitch-default Hash_Table.c  -o Hash_Table.o
+gcc -c -g -Wall -Werror -Wshadow -Wfloat-equal -Wswitch-default ../Dump/Hash_Table_Dump.c -o ../Dump/Hash_Table_Dump.o
+gcc -c -g -Wall -Werror -Wshadow -Wfloat-equal -Wswitch-default ../Hash_Research/Hash_Research.c  -o ../Hash_Research/Hash_Research.o
+gcc main.o Hash_Table.o ../Dump/Hash_Table_Dump.o ../Hash_Research/Hash_Research.o ../../../SHA_256/sha_256.a ../../../My_Lib/My_Lib.a -o Hash_Table.out
 rm main.o
 rm Hash_Table.o
-rm Dump/Hash_Table_Dump.o
-rm Hash_Research/Hash_Research.o
+rm ../Dump/Hash_Table_Dump.o
+rm ../Hash_Research/Hash_Research.o
 ```
+
+All version of the hash table (Not_Optimized, Version_O, ..., Version_4) are built with degub information (-g) and no optimization flags.
 
 **Step 3:** Running
 ```bash
@@ -200,7 +202,7 @@ SHA-256 has shown the best result. Nevertheless, Ded_Hash is also not bad. Becau
 
 # Hash table optimization
 
-I used *callgrind* to get profiling data and *kcachegrind* to visualize it.
+I used *callgrind* to get profiling data and *kcachegrind* to visualize it. There are some references to "clock signals" below. It means processor clock signals I got information about from the lowest line of *kcachegrind* window.
 
 ## Version 0
 
