@@ -345,7 +345,7 @@ The idea is that gcc pushes parameters of the function into the stack and then w
 
 There is a but: since Version_3 hash table can be used only with *Ded_Hash* as a hash function. You can't choose hash function anymore. I've done this because having more than one hash function obliges to use a pointer on a function as a field of hash table structure or to implement various *HT_Search*, *HT_Insert* and *HT_Delete*: one for each hash function. The first solution decreases speed and the second is not interesting to solve. I suppose everybody can write exactly the same pieces of code replacing a specific part of them. 
 
-Good news is that I inlined *Ded_Hash* into *HT_Search* that should make a positive impact on the performance. However, we still need *Ded_Hash* implementation in an independent file for *HT_Insert* and *HT_Delete*. You can see brand new *HT_Search* [here](Optimized).
+Good news is that I inlined *Ded_Hash* into *HT_Search* that should make a positive impact on the performance. However, we still need *Ded_Hash* implementation in an independent file for *HT_Insert* and *HT_Delete*. You can see brand new *HT_Search* [here](Optimized/Version_3/HT_Search.s).
 
 No let's see what have callgrind got.
 
@@ -402,13 +402,13 @@ if ( ('a' <= buffer[symb_i] && buffer[symb_i] <= 'z') ||
 ```
 and look what it will lead to.
 
-Callgrind arrives with good news!
+Callgrind arrives with great news!
 
 ![Version_4](Optimized/Version_4/Version_4.png)
 
 Comparing to Version_3, the boost is approximately 10,8%. Total boost is about 43,2%.
 
-As we see in the last picture, functions on lines 2-4 are already optimized. Optimizing *HT_Insert* isn't reasonalbe (as it was mentioned) I'm obviously not good enough to make *malloc*, *calloc*, *strlen* and *memcpy* better than they already are. We can continue improving performance of *Divide_In_Words* but we won't. Firstly, this function is just a test for functions that work with hash table such as *HT_Insert* and *HT_Search*. That's why optimizing it won't optimize hash table itself. Secondly, apart from calling *HT_Search* and *HT_Insert* *Divide_In_Words* has conditional operators and a cycle. We could try to optimize them by implementing this function in the assembly language but gcc with -O2 flag would do a better job. So, Version_4 is the last one.
+As we see in the last picture, functions on lines 2-4 are already optimized. Optimizing *HT_Insert* isn't reasonalbe (as it was mentioned). I'm obviously not good enough to make *malloc*, *calloc*, *strlen* and *memcpy* better than they already are. We can continue improving performance of *Divide_In_Words* but we won't. Firstly, this function is just a test for functions that work with hash table such as *HT_Insert* and *HT_Search*. That's why optimizing it won't optimize hash table itself. Secondly, apart from calling *HT_Search* and *HT_Insert* *Divide_In_Words* has conditional operators and a cycle. We could try to optimize them by implementing this function in the assembly language but gcc with -O2 flag would do a better job. So, Version_4 is the last one.
 
 ## Conclusion
 
@@ -423,8 +423,8 @@ We succeded in accelerating the work of hash table. It took 291 382 650 clock si
 
 The result is that my optimization is relatively close to the result of gcc with any optimization flag. Let's calculate the most important coefficient that is widely known Ded_Coefficient.
 
-Ded_Coefficient = acceleration value / number of assembly lines * 1000
+Ded_Coefficient = (acceleration value / number of assembly lines) * 1000
 
 We will count only instruction and won't count comments, labels or names of functions. Taking this into consideration, we find: Ded_Hash.s - 10 lines, HT_Search.s - 48 lines, Str_Cmp_SSE.s - 17 lines. All in all:
 
-Ded_Coefficient = 43,2 / 75*1000 = 576
+Ded_Coefficient = (43,2 / 75) * 1000 = 576
