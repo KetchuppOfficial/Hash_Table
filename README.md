@@ -423,7 +423,7 @@ We succeded in accelerating the work of hash table. It took 291 382 650 clock si
 |       -O2       |  135 796 371  |
 |       -O3       |  135 617 014  |
 
-The result is that my optimization is relatively close to the result of gcc with any optimization flag. Let's calculate the most important coefficient that is widely known Ded_Coefficient.
+The result is that my optimization is relatively close to the result of gcc with one of optimization flags -O1, -O2 or -O3. Let's calculate the most important coefficient that is widely known Ded_Coefficient.
 
 Ded_Coefficient = (acceleration value / number of assembly lines) * 1000
 
