@@ -1,38 +1,54 @@
-CC = gcc
-CFLAGS = -g -Wall -Werror -Wshadow -Wfloat-equal -Wswitch-default
+CC     = gcc
+CFLAGS = -Wall -Werror -Wshadow -Wfloat-equal -Wswitch-default
 
-SHA_LIB = ../../../SHA_256/sha_256.a
-MY_LIB  = ../../../My_Lib/My_Lib.a
+DBG = -g
 
-DUMP = ../Dump/
-RSRCH = ../Hash_Research/
+SHA_LIB = ~/Programming/SHA_256/sha_256.a
+MY_LIB  = ~/Programming/My_Lib/My_Lib.a
 
-OPT = 
+BIN      = ./bin/
+SRCDIR   = ./src/
+BUILDDIR = ./build/
 
-all: Hash_Table clean
+SRC_LIST = main.c Hash_Table.c Hash_Table_Dump.c Hash_Research.c
+SRC = $(addprefix $(SRCDIR),$(SRC_LIST))
 
-Hash_Table: main.o Hash_Table.o Hash_Table_Dump.o Hash_Table_Reasearch.o
-	$(CC) main.o Hash_Table.o $(DUMP)Hash_Table_Dump.o $(RSRCH)Hash_Research.o $(SHA_LIB) $(MY_LIB) -o Hash_Table.out
+SUBS := $(SRC)
+SUBS := $(subst $(SRCDIR), $(BUILDDIR), $(SUBS))
 
-main.o:
-	$(CC) $(CFLAGS) -c main.c $(OPT) -o main.o
+OBJ  = $(SUBS:.c=.o)
+DEPS = $(SUBS:.c=.d)
 
-Hash_Table.o:
-	$(CC) $(CFLAGS) -c Hash_Table.c $(OPT) -o Hash_Table.o
+include $(DEPS)
 
-Hash_Table_Dump.o:
-	$(CC) $(CFLAGS) -c $(DUMP)Hash_Table_Dump.c -o $(DUMP)Hash_Table_Dump.o
+.PHONY: all
 
-Hash_Table_Reasearch.o:
-	$(CC) $(CFLAGS) -c $(RSRCH)Hash_Research.c $(OPT) -o $(RSRCH)Hash_Research.o
+all: $(DEPS) $(OBJ)
+	@mkdir -p $(BIN)
+	@echo "Linking project..."
+	@$(CC) $(OBJ) $(SHA_LIB) $(MY_LIB) -o $(BIN)Hash_Table.out
 
-run:
-	./Hash_Table.out
+$(BUILDDIR)%.o: $(SRCDIR)%.c
+	@mkdir -p $(dir $@)
+	@echo "Compiling \"$<\"..."
+	@$(CC) $(CFLAGS) $(DBG) $(DEBUG) -c $< -o $@
+
+$(BUILDDIR)%.d: $(SRCDIR)%.c
+	@echo "Collecting dependencies for \"$<\"..."
+	@mkdir -p $(dir $@)
+	@$(CC) -E $(CFLAGS) $< -MM -MT $(@:.d=.o) > $@	
+
+.PHONY: clean run profile
+
+run: $(BIN)Hash_Table.out
+	@echo "Running \"$<\"..."
+	@$(BIN)Hash_Table.out
 
 clean:
-	rm main.o Hash_Table.o $(DUMP)Hash_Table_Dump.o $(RSRCH)Hash_Research.o
+	rm -rf $(OBJ) $(DEPS)
 
-profile:
-	valgrind --tool=callgrind ./Hash_Table.out
-	kcachegrind
-	rm callgrind.out.*
+profile: $(BIN)Hash_Table.out
+	@echo "Profiling \"$<\"..."
+	@valgrind --tool=callgrind $(BIN)Hash_Table.out
+	@kcachegrind
+	@rm -rf callgrind.out.*

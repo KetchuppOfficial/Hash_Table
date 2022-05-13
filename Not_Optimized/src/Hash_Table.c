@@ -1,8 +1,9 @@
-#include "Hash_Table.h"
+#include "../Hash_Table.h"
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //                                         HASH FUNCTIONS                                         //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+
 
 static uint64_t Cringe_1 (const char *data)
 {
@@ -175,10 +176,7 @@ int HT_Insert (struct Hash_Table *ht_ptr, const char *data)
     {
         ht_ptr->array[hash] = Add_Node (data);
 
-        #if DEBUG == 1
-        if (ht_ptr->array[hash] == NULL)
-            MY_ASSERT (false, "Add_Node ()", FUNC_ERROR, ERROR);
-        #endif
+        MY_ASSERT (ht_ptr->array[hash], "Add_Node ()", FUNC_ERROR, ERROR);
     }
     else
     {
@@ -192,10 +190,7 @@ int HT_Insert (struct Hash_Table *ht_ptr, const char *data)
         }
 
         current->next = Add_Node (data);
-        #if DEBUG == 1
-        if (current->next == NULL)
-            MY_ASSERT (false, "Add_Node ()", FUNC_ERROR, ERROR);
-        #endif
+        MY_ASSERT (current->next, "Add_Node ()", FUNC_ERROR, ERROR);
     }
 
     return NO_ERRORS;
