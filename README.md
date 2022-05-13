@@ -46,16 +46,30 @@ Compiling "src/Hash_Research.c"...
 Linking project...
 ```
 
+If you compile **Not_Opimized** version of the hash table, you can use some options:
+1) You can make a .png image of the hash table using:
+```bash
+make OPT=-DDUMP
+```
+2) You can turn on all **MY_ASSERT** macros from **My_Lib** and showing the number of word in the hash table (kind of debug mode):
+```bash
+make OPT=-DDEBUG
+```
+3) Previous options can be used simultaneously:
+```bash
+make OPT=-DDEBUG\ -DDUMP    # don't forget backslash!
+```
+
 All version of the hash table (Not_Optimized, Version_O, ..., Version_4) are built with degub information (-g) and no optimization flags.
 
 **Step 3:** Running
 ```bash
-$ make run
+make run
 ```
 
-If you wand to delete an executable file (Hash_Table.out) and a log file (log_file.log), run:
+If you wand to delete all object and dependencies files from `./build/`, run:
 ```bash
-$ make clean
+make clean
 ```
 
 # Dependencies
