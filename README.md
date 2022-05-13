@@ -34,20 +34,18 @@ $ git clone git@github.com:KetchuppOfficial/Hash_Table.git
 
 **Step 2:** Build the project
 ```bash
-$ make
+make
 ```
-If building ended well you'll see a similar message:
-```bash
-ketchupp@ketchupp-HVY-WXX9:~/Programming/Semester_2/Hash_Table/Not_Optimized$ make
-gcc -c -g -Wall -Werror -Wshadow -Wfloat-equal -Wswitch-default main.c  -o main.o
-gcc -c -g -Wall -Werror -Wshadow -Wfloat-equal -Wswitch-default Hash_Table.c  -o Hash_Table.o
-gcc -c -g -Wall -Werror -Wshadow -Wfloat-equal -Wswitch-default ../Dump/Hash_Table_Dump.c -o ../Dump/Hash_Table_Dump.o
-gcc -c -g -Wall -Werror -Wshadow -Wfloat-equal -Wswitch-default ../Hash_Research/Hash_Research.c  -o ../Hash_Research/Hash_Research.o
-gcc main.o Hash_Table.o ../Dump/Hash_Table_Dump.o ../Hash_Research/Hash_Research.o ../../../SHA_256/sha_256.a ../../../My_Lib/My_Lib.a -o Hash_Table.out
-rm main.o
-rm Hash_Table.o
-rm ../Dump/Hash_Table_Dump.o
-rm ../Hash_Research/Hash_Research.o
+Collecting dependencies for "src/Hash_Research.c"...
+Collecting dependencies for "src/Hash_Table_Dump.c"...
+Collecting dependencies for "src/Hash_Table.c"...
+Collecting dependencies for "src/main.c"...
+Compiling "src/main.c"...
+Compiling "src/Hash_Table.c"...
+Compiling "src/Hash_Table_Dump.c"...
+Compiling "src/Hash_Research.c"...
+Linking project...
+
 ```
 
 All version of the hash table (Not_Optimized, Version_O, ..., Version_4) are built with degub information (-g) and no optimization flags.
