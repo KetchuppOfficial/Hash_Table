@@ -6,8 +6,6 @@
 #include <string.h>
 #include <ctype.h>
 
-#define DUMP 1
-
 #include "/home/ketchupp/Programming/SHA_256/sha_256.h"
 
 #include "/home/ketchupp/Programming/My_Lib/My_Lib.h"

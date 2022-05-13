@@ -1,7 +1,7 @@
 #include "../Hash_Table.h"
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-const char dump_file_dir[]  = "../Dump/";
+const char dump_file_dir[]  = "Dump/";
 
 const char dot_file_name[]  = "Dump.dot";
 

@@ -19,8 +19,6 @@ SUBS := $(subst $(SRCDIR), $(BUILDDIR), $(SUBS))
 OBJ  = $(SUBS:.c=.o)
 DEPS = $(SUBS:.c=.d)
 
-include $(DEPS)
-
 .PHONY: all
 
 all: $(DEPS) $(OBJ)
@@ -31,7 +29,9 @@ all: $(DEPS) $(OBJ)
 $(BUILDDIR)%.o: $(SRCDIR)%.c
 	@mkdir -p $(dir $@)
 	@echo "Compiling \"$<\"..."
-	@$(CC) $(CFLAGS) $(DBG) $(DEBUG) -c $< -o $@
+	@$(CC) $(CFLAGS) $(DBG) $(OPT) -c $< -o $@
+
+include $(DEPS)
 
 $(BUILDDIR)%.d: $(SRCDIR)%.c
 	@echo "Collecting dependencies for \"$<\"..."
