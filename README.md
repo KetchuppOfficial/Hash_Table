@@ -60,7 +60,7 @@ make OPT=-DDEBUG
 make OPT=-DDEBUG\ -DDUMP    # don't forget backslash!
 ```
 
-All version of the hash table (Not_Optimized, Version_O, ..., Version_4) are built with degub information (-g) and no optimization flags.
+All version of the hash table (Not_Optimized, Version_O, ..., Version_4) are built with debug information (-g) and no optimization flags.
 
 **Step 3:** Running
 ```bash
