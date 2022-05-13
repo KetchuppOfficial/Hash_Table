@@ -76,7 +76,7 @@ The 2nd library is [SHA_256](https://github.com/KetchuppOfficial/SHA_256) that i
 
 ## Paths to libraries
 
-If relative paths from files of this projects to the mentioned libraries differ from the default ones, you have to change them in [Hash_Table.h](https://github.com/KetchuppOfficial/Hash_Table/blob/master/Hash_Table.h).
+Paths from files of this projects to the mentioned libraries surely differs from the default ones, you have to change them in [Hash_Table.h](https://github.com/KetchuppOfficial/Hash_Table/blob/master/Hash_Table.h).
 
 ```C
 #ifndef HASH_TABLE_INCLUDED
@@ -87,9 +87,9 @@ If relative paths from files of this projects to the mentioned libraries differ 
 #include <string.h>
 #include <ctype.h>
 
-#include "../../SHA_256/sha_256.h"  // <------- Change here
+#include "/home/ketchupp/Programming/SHA_256/sha_256.h"  // <------- Change here
 
-#include "../../My_Lib/My_Lib.h"    // <------- And here
+#include "/home/ketchupp/Programming/My_Lib/My_Lib.h"    // <------- And here
 ```
 
 # Hash functions research
@@ -112,7 +112,7 @@ static uint64_t Cringe_1 (const char *data)
 
 As far as the output of *Cringe_1 ()* is known from the very beginnig, the size was chosen resonably small.
 
-![Cringe_1](Hash_Research/CRINGE_1.png)
+![Cringe_1](Not_Optimized/Hash_Research/CRINGE_1.png)
 
 ## ASCII_Hash
 
@@ -127,7 +127,7 @@ static uint64_t ASCII_Hash (const char *data)
 
 Since ASCII-codes belong to [0; 255] and John Ronald Reuel Tolkien could use only first 128 of them, the size was chosen appropriate.
 
-![ASCII_HASH](Hash_Research/ASCII_HASH.png)
+![ASCII_HASH](Not_Optimized/Hash_Research/ASCII_HASH.png)
 
 ## Len_Hash
 
@@ -142,7 +142,7 @@ static uint64_t Len_Hash (const char *data)
 
 As the ordinary length of words in fiction is obviously less than 50, the size was chosed a little overstated.
 
-![Len_Hash](Hash_Research/LEN_HASH.png)
+![Len_Hash](Not_Optimized/Hash_Research/LEN_HASH.png)
 
 ## Checksum
 
@@ -162,7 +162,7 @@ static uint64_t Checksum (const char *data)
 
 Three previous function was a kind of joke and shouldn't be treated seriously. Since *Checksum ()* hash function are *real*, if it can be said this way. Here and further the size of the hash table is 2000 cells. The load factor is approximately 8,24 as there are 16485 words in the hash table.
 
-![Checksum](Hash_Research/CHECKSUM.png)
+![Checksum](Not_Optimized/Hash_Research/CHECKSUM.png)
 
 ## Ded_Hash
 
@@ -186,7 +186,7 @@ static uint64_t Ded_Hash (const char *data)
 
 **Hash table size:** 2000 cells
 
-![Ded_Hash](Hash_Research/DED_HASH.png)
+![Ded_Hash](Not_Optimized/Hash_Research/DED_HASH.png)
 
 ## SHA-256
 
@@ -194,7 +194,7 @@ Implementation of this function can be seen on the GitHub page of my SHA-256.
 
 **Hash table size:** 2000 cells
 
-![SHA_256](Hash_Research/SHA_256.png)
+![SHA_256](HNot_Optimized/ash_Research/SHA_256.png)
 
 ## Conclusion
 
