@@ -418,13 +418,13 @@ Callgrind arrives with great news!
 
 ![Version_4](Optimized/Version_4/Version_4.png)
 
-Comparing to Version_3, the boost is approximately 10,8%. Total boost is about 43,2%.
+Comparing to Version_3, the boost is approximately 10,8%. Total boost is about 42,9%.
 
 As we see in the last picture, functions on lines 2-4 are already optimized. Optimizing *HT_Insert* isn't reasonalbe (as it was mentioned). I'm obviously not good enough to make *malloc*, *calloc*, *strlen* and *memcpy* better than they already are. We can continue improving performance of *Divide_In_Words* but we won't. Firstly, this function is just a test for functions that work with hash table such as *HT_Insert* and *HT_Search*. That's why optimizing it won't optimize hash table itself. Secondly, apart from calling *HT_Search* and *HT_Insert* *Divide_In_Words* has conditional operators and a cycle. We could try to optimize them by implementing this function in the assembly language but gcc with -O2 flag would do a better job. So, Version_4 is the last one.
 
 ## Conclusion
 
-We succeded in accelerating the work of hash table. It took 290 210 517 clock signals to execute Version_0 and only 165 580 372 to execute Version_4 that is approximately 43,2% boost. Let's compare the final result with Version_0 compiled with flags -O1, -O2 and -O3.
+We succeded in accelerating the work of hash table. It took 290 210 517 clock signals to execute Version_0 and only 165 580 372 to execute Version_4 that is approximately 42,9% boost. Let's compare the final result with Version_0 compiled with flags -O1, -O2 and -O3.
 
 |                 | Clock signals |
 |-----------------|---------------|
@@ -439,4 +439,4 @@ Ded_Coefficient = (acceleration value / number of assembly lines) * 1000
 
 We will count only instruction and won't count comments, labels or names of functions. Taking this into consideration, we find: Ded_Hash.s - 10 lines, HT_Search.s - 48 lines, Str_Cmp_SSE.s - 17 lines. All in all:
 
-Ded_Coefficient = (43,2 / 75) * 1000 = 576
+Ded_Coefficient = (43,2 / 75) * 1000 = 572
