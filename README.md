@@ -424,7 +424,7 @@ As we see in the last picture, functions on lines 2-4 are already optimized. Opt
 
 ## Conclusion
 
-We succeded in accelerating the work of hash table. It took 291 382 650 clock signals to execute Version_0 and only 165 580 372 to execute Version_4 that is approximately 43,2% boost. Let's compare the final result with Version_0 compiled with flags -O1, -O2 and -O3.
+We succeded in accelerating the work of hash table. It took 290 210 517 clock signals to execute Version_0 and only 165 580 372 to execute Version_4 that is approximately 43,2% boost. Let's compare the final result with Version_0 compiled with flags -O1, -O2 and -O3.
 
 |                 | Clock signals |
 |-----------------|---------------|
