@@ -204,7 +204,7 @@ Implementation of this function can be seen on the GitHub page of my SHA-256.
 
 **Hash table size:** 2000 cells
 
-![SHA_256](Not_Optimized/ash_Research/SHA_256.png)
+![SHA_256](Not_Optimized/Hash_Research/SHA_256.png)
 
 ## Conclusion
 
