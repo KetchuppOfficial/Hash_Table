@@ -216,7 +216,7 @@ I used *callgrind* to get profiling data and *kcachegrind* to visualize it. Ther
 
 ## Version 0
 
-There are no optimizations in this version. It differs from hash table from [Not_Optimized](Not_Optimized) folder in some ways but these differences are minor (dump and counting collisions were removed, for example). It takes 291 210 517 clock signals to execute this program. Let's think how can we optimize hash table to make it work faster.
+There are no optimizations in this version. It differs from hash table from [Not_Optimized](Not_Optimized) folder in some ways but these differences are minor (dump and counting collisions were removed, for example). It takes 290 210 517 clock signals to execute this program. Let's think how can we optimize hash table to make it work faster.
 
 As we see in the picture below, execution of *Divide_In_Words* takes the longest time. 
 
