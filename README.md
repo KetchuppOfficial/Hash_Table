@@ -372,9 +372,9 @@ What should we do next? *Insert_Word* still takes the longest execution time of 
 
 ```C
 #if DEBUG == 1
-static inline int Insert_Word (struct Hash_Table *ht_ptr, char *const str, const long letter_i)
+static inline int Insert_Word (struct Hash_Table *ht_ptr, char *const str)
 #elif DEBUG == 0
-static inline void Insert_Word (struct Hash_Table *ht_ptr, char *const str, const long letter_i)
+static inline void Insert_Word (struct Hash_Table *ht_ptr, char *const str)
 #endif
 {
     if (HT_Search (ht_ptr, str) == NOT_FOUND)

@@ -7,9 +7,9 @@
 //***********************************************************************************************//
 
 #if DEBUG == 1
-static inline int Insert_Word (struct Hash_Table *ht_ptr, char *const str, const long letter_i)
+static inline int Insert_Word (struct Hash_Table *ht_ptr, char *const str)
 #elif DEBUG == 0
-static inline void Insert_Word (struct Hash_Table *ht_ptr, char *const str, const long letter_i)
+static inline void Insert_Word (struct Hash_Table *ht_ptr, char *const str)
 #endif
 {
     if (HT_Search (ht_ptr, str) == NOT_FOUND)
@@ -45,9 +45,9 @@ static void Divide_In_Words (struct Hash_Table *ht_ptr, const char *buffer, cons
         else if (letter_i > 0L)
         {
             #if DEBUG == 1
-            n_words += Insert_Word (ht_ptr, str, letter_i);
+            n_words += Insert_Word (ht_ptr, str);
             #elif DEBUG == 0
-            Insert_Word (ht_ptr, str, letter_i);
+            Insert_Word (ht_ptr, str);
             #endif
 
             letter_i = 0L;
@@ -58,9 +58,9 @@ static void Divide_In_Words (struct Hash_Table *ht_ptr, const char *buffer, cons
     if (letter_i > 0L)
     {
         #if DEBUG == 1
-        n_words += Insert_Word (ht_ptr, str, letter_i);
+        n_words += Insert_Word (ht_ptr, str);
         #elif DEBUG == 0
-        Insert_Word (ht_ptr, str, letter_i);
+        Insert_Word (ht_ptr, str);
         #endif
     }
     
