@@ -269,7 +269,7 @@ Speaking about the number of clock signals, we've got approximately 24,4% boost.
 
 ## Version 2
 
-I could use Intel<sup>&reg;</sup> intrinsics to accelerate *strcmp* but absence of optimization flags for the compiler ruins this idea. If we don't use -O2, intrinsics will work very slow because of being pushed into RAM instead of registers. As I use no optimization flags, the only option is to implement a function to compare strings in the assembly language. Here is the source code (you can also look at it [here](Optimized/Version_2/Str_Cmp_SSE.s)):
+I could use Intel<sup>&reg;</sup> intrinsics to accelerate *strcmp* but absence of optimization flags for the compiler ruins this idea. If we don't use -O1, intrinsics will work very slow because of being pushed into RAM instead of registers. As I use no optimization flags, the only option is to implement a function to compare strings in the assembly language. Here is the source code (you can also look at it [here](Optimized/Version_2/Str_Cmp_SSE.s)):
 
 ```assembly
 Str_Cmp_SSE:
