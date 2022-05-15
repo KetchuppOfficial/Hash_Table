@@ -86,7 +86,7 @@ The 2nd library is [SHA_256](https://github.com/KetchuppOfficial/SHA_256) that i
 
 ## Paths to libraries
 
-Set your own paths to the libraries in [Makefile](/Not_Optimized/Makefile):
+Set your own paths to folder(s) with the libraries in [Makefile](/Not_Optimized/Makefile):
 ```Makefile
 CC     = gcc
 CFLAGS = -Wall -Werror -Wshadow -Wfloat-equal -Wswitch-default
