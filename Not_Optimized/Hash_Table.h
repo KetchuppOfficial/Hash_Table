@@ -6,9 +6,8 @@
 #include <string.h>
 #include <ctype.h>
 
-#include "/home/ketchupp/Programming/SHA_256/sha_256.h"
-
-#include "/home/ketchupp/Programming/My_Lib/My_Lib.h"
+#include "sha_256.h"
+#include "My_Lib.h"
 
 #ifndef DEBUG
 #undef MY_ASSERT

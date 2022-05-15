@@ -1,4 +1,4 @@
-# Hash table, its optimization and hash funcions' quality research
+# Hash table, its optimization and hash functions quality research
 
 1. [General information](#general-information)
 2. [Building](#building)
@@ -21,7 +21,7 @@
 
 # General information
 
-This project is C implementation of *hash table* - a well known data structure. My hashtable supports 6 hash functions which quality was carefully studied and is presented below. A unique feature of this projects is its second part - optimization of hash table with the help of knowlendge in processor architecture.
+This project is a C implementation of *hash table* - a well known data structure. My hash table supports 6 hash functions which quality were carefully studied and are presented below. A unique feature of this project is its second part - optimization of hash table with the help of knowledge in processor architecture.
 
 # Building
 
@@ -86,27 +86,25 @@ The 2nd library is [SHA_256](https://github.com/KetchuppOfficial/SHA_256) that i
 
 ## Paths to libraries
 
-Paths from files of this projects to the mentioned libraries surely differs from the default ones, you have to change them in [Hash_Table.h](https://github.com/KetchuppOfficial/Hash_Table/blob/master/Hash_Table.h).
+Set your own paths to the libraries in [Makefile](/Not_Optimized/Makefile):
+```make
+CC     = gcc
+CFLAGS = -Wall -Werror -Wshadow -Wfloat-equal -Wswitch-default
 
-```C
-#ifndef HASH_TABLE_INCLUDED
-#define HASH_TABLE_INCLUDED
+DBG = -g
 
-#include <stdlib.h>
-#include <inttypes.h>
-#include <string.h>
-#include <ctype.h>
-
-#include "/home/ketchupp/Programming/SHA_256/sha_256.h"  // <------- Change here
-
-#include "/home/ketchupp/Programming/My_Lib/My_Lib.h"    // <------- And here
+SHA_LIB_PATH = /home/ketchupp/Programming/SHA_256/      # <---- here
+MY_LIB_PATH  = /home/ketchupp/Programming/My_Lib/       # <---- and here
+                                                        # don't forget about backslashed in the end
 ```
 
 # Hash functions research
 
-**Experiment conditions.** Hash table was filled with words of *"The Lord of the Rings"*. If a word has already been added, it won't be added again. Sequently, each word differs from others. Choosing an exact size of the hash table was based on specifics of each hash function.
+**Experiment conditions.** Hash table was filled with words of *"The Lord of the Rings"*. If a word has already been added, it won't be added again. Sequently each word differs from others. It means that this experiment is a way to estimate the quality of a hash function.
 
-As it was mentioned earlier, my hash table can use one of 6 hash function. The following is pieces of information about each on of them and graphs that show a number of worlds in every cell of the hash table. As far as two words in any pair differ from each other, this experiment is a way to estimate the number of collisions of all 6 hash functions.
+My program calculates the number of collisions in every bucket and prints it into a .txt file. This data is visualized with the help of **python**. You can see information about hash functions, that were used, below.
+
+The size of the hash table was chosen to be 2000 so that the load factor is approximately 8,24.
 
 ## Cringe_1
 
@@ -118,11 +116,7 @@ static uint64_t Cringe_1 (const char *data)
 }
 ```
 
-**Hash table size:** 20 cells.
-
-As far as the output of *Cringe_1 ()* is known from the very beginnig, the size was chosen resonably small.
-
-![Cringe_1](Not_Optimized/Hash_Research/CRINGE_1.png)
+![Cringe_1](Not_Optimized/Hash_Research/Cringe-1.png)
 
 ## ASCII_Hash
 
@@ -133,11 +127,8 @@ static uint64_t ASCII_Hash (const char *data)
     return (uint64_t)data[0];
 }
 ```
-**Hash table size:** 128 cells. 
 
-Since ASCII-codes belong to [0; 255] and John Ronald Reuel Tolkien could use only first 128 of them, the size was chosen appropriate.
-
-![ASCII_HASH](Not_Optimized/Hash_Research/ASCII_HASH.png)
+![ASCII_HASH](Not_Optimized/Hash_Research/ASCII-Hash.png)
 
 ## Len_Hash
 
@@ -148,11 +139,8 @@ static uint64_t Len_Hash (const char *data)
     return strlen (data);
 }
 ```
-**Hash table size:** 50 cells. 
 
-As the ordinary length of words in fiction is obviously less than 50, the size was chosed a little overstated.
-
-![Len_Hash](Not_Optimized/Hash_Research/LEN_HASH.png)
+![Len_Hash](Not_Optimized/Hash_Research/Len-Hash.png)
 
 ## Checksum
 
@@ -168,15 +156,12 @@ static uint64_t Checksum (const char *data)
     return checksum;
 }
 ```
-**Hash table size:** 2000 cells. 
 
-Three previous function was a kind of joke and shouldn't be treated seriously. Since *Checksum ()* hash function are *real*, if it can be said this way. Here and further the size of the hash table is 2000 cells. The load factor is approximately 8,24 as there are 16485 words in the hash table.
-
-![Checksum](Not_Optimized/Hash_Research/CHECKSUM.png)
+![Checksum](Not_Optimized/Hash_Research/Checksum.png)
 
 ## Ded_Hash
 
-I was informed about this function by my teacher [Ded](https://github.com/ded32).
+This function is usually called **ror hash**, but in my work I named after my teacher[Ded](https://github.com/ded32), who told me about this function.
 ```C
 static inline uint64_t ror(uint64_t num, uint64_t shift)
 {
@@ -194,9 +179,7 @@ static uint64_t Ded_Hash (const char *data)
 }
 ```
 
-**Hash table size:** 2000 cells
-
-![Ded_Hash](Not_Optimized/Hash_Research/DED_HASH.png)
+![Ded_Hash](Not_Optimized/Hash_Research/Ded-Hash.png)
 
 ## SHA-256
 
@@ -204,19 +187,19 @@ Implementation of this function can be seen on the GitHub page of my SHA-256.
 
 **Hash table size:** 2000 cells
 
-![SHA_256](Not_Optimized/Hash_Research/SHA_256.png)
+![SHA_256](Not_Optimized/Hash_Research/SHA-256.png)
 
 ## Conclusion
 
-SHA-256 has shown the best result. Nevertheless, Ded_Hash is also not bad. Because the algorithm of SHA-256 is kind of difficult, we will use Ded_Hash in the second part of work.
+SHA-256 has shown the best result. Nevertheless, Ded_Hash is in second place. Because the algorithm of SHA-256 is kind of difficult, we will use Ded_Hash at the second part of the work.
 
 # Hash table optimization
 
-I used *callgrind* to get profiling data and *kcachegrind* to visualize it. There are some references to "clock signals" below. It means processor clock signals I got information about from the lowest line of *kcachegrind* window.
+I used *callgrind* to get profiling data and *kcachegrind* to visualize it. There are some references to "clock signals" below. It means processor clock signals I got information about from the lower line of *kcachegrind* window.
 
 ## Version 0
 
-There are no optimizations in this version. It differs from hash table from [Not_Optimized](Not_Optimized) folder in some ways but these differences are minor (dump and counting collisions were removed, for example). It takes 290 210 517 clock signals to execute this program. Let's think how can we optimize hash table to make it work faster.
+There are no optimizations in this version. It differs from hash table from [Not_Optimized](Not_Optimized) folder in some ways, but these differences are minor (dump and counting collisions were removed, for example). It takes 290 210 517 clock signals to execute this program. Let's think how can we optimize the hash table to make it work faster.
 
 As we see in the picture below, execution of *Divide_In_Words* takes the longest time. 
 

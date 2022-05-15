@@ -3,7 +3,6 @@
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 
 const char *text = "../The Lord of the Rings.txt";
-const char *test  = "test.txt";
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 int main (void)
@@ -12,16 +11,9 @@ int main (void)
     OPEN_LOG_FILE;
     #endif
 
-    struct Hash_Table *ht_ptr = HT_Ctor (SHA_256, 20);
-
-    HT_Fill (ht_ptr, test);
-
+    struct Hash_Table *ht_ptr = HT_Ctor (CRINGE_1, 2000);
+    HT_Fill (ht_ptr, text);
     HT_Show_Collisons (ht_ptr);
-    
-    #ifdef DUMP
-    HT_Dump (ht_ptr);
-    #endif
-
     HT_Dtor (ht_ptr);
     
     return 0;

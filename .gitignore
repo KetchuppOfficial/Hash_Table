@@ -8,6 +8,8 @@
 
 *.log
 
+*.sh
+
 callgrind.out.*
 
 *.dot

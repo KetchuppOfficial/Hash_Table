@@ -151,15 +151,15 @@ static struct Node *Add_Node (const char *data)
     struct Node *new_node = (struct Node *)calloc (1, sizeof (struct Node));
     MY_ASSERT (new_node, "struct Node *new_node", NE_MEM, NULL);
 
-    size_t len = strlen (data) + 1;
-    char *str = (char *)calloc (len, sizeof (char));
+    size_t len = strlen (data);
+    char *str = (char *)calloc (len + 1, sizeof (char));
     MY_ASSERT (str, "char *str", NE_MEM, NULL);
 
-    memcpy (str, data, len);
+    memcpy (str, data, len + 1);
 
     new_node->next = NULL;
     new_node->data = str;
-    new_node->len  = len - 1;
+    new_node->len  = len;
 
     return new_node;
 }
@@ -215,7 +215,7 @@ static int List_Search (struct Node *const list_ptr, const char *const data)
     return (memcmp (current->data, data, current->len + 1) == 0) ? node_i : NOT_FOUND;
 }
 
-int HT_Search (const struct Hash_Table *ht_ptr, const char *const data) // have to call List_Search
+int HT_Search (const struct Hash_Table *ht_ptr, const char *const data)
 {
     MY_ASSERT (ht_ptr, "const struct Hash_Table *ht_ptr", NULL_PTR, ERROR);
     MY_ASSERT (data,   "const char *data",                NULL_PTR, ERROR);

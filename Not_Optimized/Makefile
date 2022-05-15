@@ -3,8 +3,11 @@ CFLAGS = -Wall -Werror -Wshadow -Wfloat-equal -Wswitch-default
 
 DBG = -g
 
-SHA_LIB = ~/Programming/SHA_256/sha_256.a
-MY_LIB  = ~/Programming/My_Lib/My_Lib.a
+SHA_LIB_PATH = /home/ketchupp/Programming/SHA_256/
+MY_LIB_PATH  = /home/ketchupp/Programming/My_Lib/
+
+SHA_LIB = $(join $(SHA_LIB_PATH), sha_256.a)
+MY_LIB  = $(join $(MY_LIB_PATH), My_Lib.a)
 
 BIN      = ./bin/
 SRCDIR   = ./src/
@@ -29,14 +32,14 @@ all: $(DEPS) $(OBJ)
 $(BUILDDIR)%.o: $(SRCDIR)%.c
 	@mkdir -p $(dir $@)
 	@echo "Compiling \"$<\"..."
-	@$(CC) $(CFLAGS) $(DBG) $(OPT) -c $< -o $@
+	@$(CC) $(CFLAGS) -I$(SHA_LIB_PATH) -I$(MY_LIB_PATH) $(DBG) $(OPT) -c $< -o $@
 
 include $(DEPS)
 
 $(BUILDDIR)%.d: $(SRCDIR)%.c
-	@echo "Collecting dependencies for \"$<\"..."
 	@mkdir -p $(dir $@)
-	@$(CC) -E $(CFLAGS) $< -MM -MT $(@:.d=.o) > $@	
+	@echo "Collecting dependencies for \"$<\"..."
+	@$(CC) -E $(CFLAGS) -I$(SHA_LIB_PATH) -I$(MY_LIB_PATH) $< -MM -MT $(@:.d=.o) > $@	
 
 .PHONY: clean run profile
 
