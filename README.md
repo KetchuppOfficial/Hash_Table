@@ -96,7 +96,7 @@ DBG = -g
 SHA_LIB_PATH = /home/ketchupp/Programming/SHA_256/      # <---- here
 MY_LIB_PATH  = /home/ketchupp/Programming/My_Lib/       # <---- and here
 
-# don't forget about backslashe in the end of each path!
+# don't forget about backslash in the end of each path!
 ```
 
 # Hash functions research
