@@ -87,7 +87,7 @@ The 2nd library is [SHA_256](https://github.com/KetchuppOfficial/SHA_256) that i
 ## Paths to libraries
 
 Set your own paths to the libraries in [Makefile](/Not_Optimized/Makefile):
-```make
+```Makefile
 CC     = gcc
 CFLAGS = -Wall -Werror -Wshadow -Wfloat-equal -Wswitch-default
 
@@ -95,7 +95,8 @@ DBG = -g
 
 SHA_LIB_PATH = /home/ketchupp/Programming/SHA_256/      # <---- here
 MY_LIB_PATH  = /home/ketchupp/Programming/My_Lib/       # <---- and here
-                                                        # don't forget about backslashed in the end
+
+# don't forget about backslashe in the end of each path!
 ```
 
 # Hash functions research
