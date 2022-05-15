@@ -32,7 +32,7 @@ static uint64_t Checksum (const char *data)
 
 static inline uint64_t ror (uint64_t num, uint64_t shift)
 {
-    return (num >> shift) | (num << (64 - shift));
+    return (num >> shift) | (num << (__CHAR_BIT__ * sizeof (uint64_t) - shift));
 }
 
 static uint64_t Ded_Hash (const char *data)
@@ -175,22 +175,16 @@ int HT_Insert (struct Hash_Table *ht_ptr, const char *data)
     if (ht_ptr->array[hash] == NULL)
     {
         ht_ptr->array[hash] = Add_Node (data);
-
         MY_ASSERT (ht_ptr->array[hash], "Add_Node ()", FUNC_ERROR, ERROR);
     }
     else
     {
-        struct Node *current = ht_ptr->array[hash];
-        struct Node *next    = current->next;
-
-        while (next != NULL)
-        {
-            current = next;
-            next = current->next;
-        }
-
-        current->next = Add_Node (data);
-        MY_ASSERT (current->next, "Add_Node ()", FUNC_ERROR, ERROR);
+        struct Node **list_arr = ht_ptr->array;
+        
+        struct Node *old_first_node = list_arr[hash];
+        list_arr[hash] = Add_Node (data);
+        MY_ASSERT (list_arr[hash], "Add_Node ()", FUNC_ERROR, ERROR);
+        list_arr[hash]->next = old_first_node;
     }
 
     return NO_ERRORS;
@@ -201,7 +195,27 @@ int HT_Insert (struct Hash_Table *ht_ptr, const char *data)
 //                                     SEARCHING AND DELETING                                    //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 
-int HT_Search (const struct Hash_Table *ht_ptr, const char *const data)
+static int List_Search (struct Node *const list_ptr, const char *const data)
+{
+    struct Node *current = list_ptr;
+    struct Node *next    = list_ptr->next;
+
+    int node_i = 0;
+    for ( ; next != NULL; node_i++)
+    {           
+        if (memcmp (current->data, data, current->len + 1) == 0)
+            return node_i;
+        else
+        {
+            current = next;
+            next = current->next;
+        }
+    }
+
+    return (memcmp (current->data, data, current->len + 1) == 0) ? node_i : NOT_FOUND;
+}
+
+int HT_Search (const struct Hash_Table *ht_ptr, const char *const data) // have to call List_Search
 {
     MY_ASSERT (ht_ptr, "const struct Hash_Table *ht_ptr", NULL_PTR, ERROR);
     MY_ASSERT (data,   "const char *data",                NULL_PTR, ERROR);
@@ -212,24 +226,7 @@ int HT_Search (const struct Hash_Table *ht_ptr, const char *const data)
     if (ht_ptr->array[hash] == NULL)
         return NOT_FOUND;
     else
-    {
-        struct Node *current = ht_ptr->array[hash];
-        struct Node *next    = current->next;
-
-        int node_i = 0;
-        for ( ; next != NULL; node_i++)
-        {           
-            if (memcmp (current->data, data, current->len + 1) == 0)
-                return node_i;
-            else
-            {
-                current = next;
-                next = current->next;
-            }
-        }
-
-        return (memcmp (current->data, data, current->len + 1) == 0) ? node_i : NOT_FOUND;
-    }
+        return List_Search (ht_ptr->array[hash], data);
 }
 
 static inline void Delete_Beg_ (struct Hash_Table *ht_ptr, const uint64_t hash, struct Node *current)
