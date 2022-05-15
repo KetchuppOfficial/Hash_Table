@@ -114,7 +114,7 @@ static size_t *HT_Count_Collisions (const struct Hash_Table *ht_ptr)
     return collision_arr;
 }
 
-static const char names_arr[][11] = 
+static const char names_arr[][sizeof "ASCII-Hash"] = 
 {
     "Cringe-1",
     "ASCII-Hash",
@@ -124,16 +124,20 @@ static const char names_arr[][11] =
     "SHA-256",
 };
 
-static inline void Print_Histogram (const char *graph_path, const char *graph_name)
+static inline void Print_Histogram (const char *script_path, const char *graph_path, const char *graph_name)
 {
-    char *first_part = "python3 ./src/Histogram.py ";
-    int len_1 = strlen (first_part);
-    int len_2 = strlen (graph_path);
-    int len_3 = strlen (graph_name);
+    const char *first_part = "python3 ";
 
-    char *system_arg = (char *)calloc (2 * len_1 + len_2 + len_3 + 2, sizeof (char));
+    int first_len  = strlen (first_part);
+    int script_len = strlen (script_path);
+    int path_len   = strlen (graph_path);
+    int name_len   = strlen (graph_name);
+
+    char *system_arg = (char *)calloc (first_len + script_len + path_len + name_len + 3, sizeof (char));
     
-    memcpy (system_arg, first_part, len_1);
+    memcpy (system_arg, first_part, first_len);
+    strcat (system_arg, script_path);
+    strcat (system_arg, " ");
     strcat (system_arg, graph_path);
     strcat (system_arg, " ");
     strcat (system_arg, graph_name);
@@ -141,16 +145,29 @@ static inline void Print_Histogram (const char *graph_path, const char *graph_na
     printf ("%s\n", system_arg);
 
     system (system_arg);
+
+    free (system_arg);
+}
+
+static void Name_Gen (char *result, const char *path, const char *name, const char *extension)
+{
+    strcat (result, path);
+    strcat (result, name);
+    strcat (result, extension);
 }
 
 int HT_Show_Collisons (const struct Hash_Table *ht_ptr)
 {
     MY_ASSERT (ht_ptr, "const Hash_Table *ht_ptr", NULL_PTR, ERROR);
-    
-    char file_name[32] = "./Hash_Research/";
 
-    strcat (file_name, names_arr[ht_ptr->hash_func_name]);
-    strcat (file_name, ".txt");
+    const char path[] = "./Hash_Research";
+    const char *hash_func_name = names_arr[ht_ptr->hash_func_name];
+    const char extension[] = ".txt";
+
+    size_t file_name_len = sizeof path + strlen (hash_func_name) + sizeof extension;
+    char *file_name = (char *)calloc (file_name_len, sizeof (char));
+
+    Name_Gen (file_name, path, hash_func_name, extension);
 
     size_t *collision_arr = HT_Count_Collisions (ht_ptr);
     MY_ASSERT (collision_arr, "HT_Count_Collisions ()", FUNC_ERROR, ERROR);
@@ -162,8 +179,9 @@ int HT_Show_Collisons (const struct Hash_Table *ht_ptr)
         fprintf (file, "%zd\n", collision_arr[cell_i]);
 
     Close_File (file, file_name);
+    free (file_name);
 
-    Print_Histogram ("./Hash_Research/", names_arr[ht_ptr->hash_func_name]);
+    Print_Histogram ("./src/Histogram.py", "./Hash_Research/", hash_func_name);
 
     free (collision_arr);
 
