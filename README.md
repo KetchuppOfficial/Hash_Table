@@ -193,7 +193,7 @@ static uint64_t Ded_Hash (const char *data)
 
 ## CRC-32
 
-Implementation of **CRC_32** can be seen [here](Not_Optimized/src/Hash_Table.c).
+An implementation of **CRC_32** can be seen [here](Not_Optimized/src/Hash_Table.c).
 
 ![CRC_32](Not_Optimized/Hash_Research/CRC-32.png)
 
@@ -201,13 +201,13 @@ Implementation of **CRC_32** can be seen [here](Not_Optimized/src/Hash_Table.c).
 
 ## SHA-256
 
-Implementation of this function can be seen on the GitHub page of my SHA-256.
+An implementation of this function can be seen on the GitHub page of my SHA-256.
 
 **Hash table size:** 2000 cells
 
 ![SHA_256](Not_Optimized/Hash_Research/SHA-256.png)
 
-There is no qualitative difference between **SHA_256** and **CRC_32**
+There is no qualitative difference between **SHA_256** and **CRC_32**.
 
 ## Conclusion
 
