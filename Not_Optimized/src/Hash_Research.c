@@ -6,84 +6,83 @@
 //                                          FILLING                                              //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 
-static inline int Insert_Word (struct Hash_Table *ht_ptr, char *const str, const long letter_i)
+static inline char *Insert_Word (struct Hash_Table *ht_ptr, char *const str, const long letter_i)
 {
     str[letter_i] = '\0';
     int node_i = HT_Search (ht_ptr, str);
 
+    char *new_str = NULL;
     if (node_i == NOT_FOUND)
     {
-        #if DEBUG == 0
-        HT_Insert (ht_ptr, str);
-        #elif DEBUG == 1
-        int ret_val = HT_Insert (ht_ptr, str);
-        MY_ASSERT (ret_val == NO_ERRORS, "HT_Insert ()", FUNC_ERROR, ERROR);
-        #endif
-
-        return 1;
+        new_str = HT_Insert (ht_ptr, str);
+        MY_ASSERT (new_str, "HT_Insert ()", FUNC_ERROR, NULL);
     }
 
-    return 0;
+    return new_str;
 }
 
-static void Divide_In_Words (struct Hash_Table *ht_ptr, const char *buffer, const long n_symbs)
+static char **Divide_In_Words (struct Hash_Table *ht_ptr, const char *buffer, const long n_symbs, int *n_words)
 {  
     char str[MAX_WORD_LEN] = "";
 
-    #ifdef DEBUG
-    int n_words = 0;
-    #endif
-
+    char **words_arr = (char **)calloc (n_symbs, sizeof (char *));
+    MY_ASSERT (words_arr, "char **word_arr", NE_MEM, NULL);
+    int word_i = 0;
+    
     long letter_i = 0L;
     for (long symb_i = 0L; symb_i < n_symbs; symb_i++)
     {      
         if ( isalpha (buffer[symb_i]) || buffer[symb_i] == '\'')
             str[letter_i++] = buffer[symb_i];
         else if (letter_i > 0L)
-        {
-            #ifdef DEBUG
-            n_words += Insert_Word (ht_ptr, str, letter_i);
-            #else
-            Insert_Word (ht_ptr, str, letter_i);
-            #endif
+        {            
+            words_arr[word_i] = Insert_Word (ht_ptr, str, letter_i);
+            
+            if (words_arr[word_i])
+                (word_i)++;
 
             letter_i = 0L;
         }
     }
 
     if (letter_i > 0L)
-        #ifdef DEBUG
-        n_words += Insert_Word (ht_ptr, str, letter_i);
-        #else
-        Insert_Word (ht_ptr, str, letter_i);
-        #endif
+    {
+        words_arr[word_i] = Insert_Word (ht_ptr, str, letter_i);
+            
+        if (words_arr[word_i])
+            word_i++;
+    }
 
-    #if DEBUG == 1
-    printf ("n_words = %d\n", n_words);
+    words_arr = realloc (words_arr, word_i * sizeof (char *));
+    *n_words = word_i;
+
+    #ifdef DEBUG
+    printf ("n_words = %d\n", word_i);
     #endif
+
+    return words_arr;
 }
 
-int HT_Fill (struct Hash_Table *ht_ptr, const char *file_name)
+char **HT_Fill (struct Hash_Table *ht_ptr, const char *file_name, int *n_words)
 {
-    MY_ASSERT (ht_ptr, "struct Hash_Table *ht_ptr", NULL_PTR, ERROR);
-    MY_ASSERT (ht_ptr, "const char *file_name",     NULL_PTR, ERROR);
+    MY_ASSERT (ht_ptr, "struct Hash_Table *ht_ptr", NULL_PTR, NULL);
+    MY_ASSERT (ht_ptr, "const char *file_name",     NULL_PTR, NULL);
 
     FILE *file = Open_File (file_name, "rb");
-    MY_ASSERT (file, "Open_File ()", FUNC_ERROR, ERROR);
+    MY_ASSERT (file, "Open_File ()", FUNC_ERROR, NULL);
 
     long n_symbs = Define_File_Size (file);
-    MY_ASSERT (n_symbs != ERROR, "Define_File_Size ()", FUNC_ERROR, ERROR);
+    MY_ASSERT (n_symbs != ERROR, "Define_File_Size ()", FUNC_ERROR, NULL);
 
     char *buffer = Make_Buffer (file, n_symbs);
-    MY_ASSERT (buffer, "Make_Buffer ()", FUNC_ERROR, ERROR);
+    MY_ASSERT (buffer, "Make_Buffer ()", FUNC_ERROR, NULL);
 
     Close_File (file, file_name);
 
-    Divide_In_Words (ht_ptr, buffer, n_symbs);
-
+    char **words_arr = Divide_In_Words (ht_ptr, buffer, n_symbs, n_words);
     free (buffer);
 
-    return NO_ERRORS;
+    return words_arr;
 }
 
 static size_t *HT_Count_Collisions (const struct Hash_Table *ht_ptr)
@@ -93,7 +92,7 @@ static size_t *HT_Count_Collisions (const struct Hash_Table *ht_ptr)
     size_t *collision_arr = (size_t *)calloc (ht_ptr->size, sizeof (size_t));
     MY_ASSERT (collision_arr, "size_t *collision_arr", NE_MEM, NULL);
     
-    for (uint64_t cell_i = 0; cell_i < ht_ptr->size; cell_i++)
+    for (uint32_t cell_i = 0; cell_i < ht_ptr->size; cell_i++)
     {
         if (ht_ptr->array[cell_i] != NULL)
         {
@@ -121,6 +120,7 @@ static const char names_arr[][sizeof "ASCII-Hash"] =
     "Len-Hash",
     "Checksum",
     "Ded-Hash",
+    "CRC-32",
     "SHA-256",
 };
 
@@ -149,39 +149,41 @@ static inline void Print_Histogram (const char *script_path, const char *graph_p
     free (system_arg);
 }
 
-static void Name_Gen (char *result, const char *path, const char *name, const char *extension)
+static char *Name_Gen (const char *path, const char *name, const char *extension)
 {
-    strcat (result, path);
-    strcat (result, name);
-    strcat (result, extension);
+    size_t file_name_len = strlen (path) + strlen (name) + strlen (extension) + 1;
+    char *file_name = (char *)calloc (file_name_len, sizeof (char));
+    
+    strcat (file_name, path);
+    strcat (file_name, name);
+    strcat (file_name, extension);
+
+    return file_name;
 }
 
 int HT_Show_Collisons (const struct Hash_Table *ht_ptr)
 {
     MY_ASSERT (ht_ptr, "const Hash_Table *ht_ptr", NULL_PTR, ERROR);
 
-    const char path[] = "./Hash_Research";
+    size_t *collision_arr = HT_Count_Collisions (ht_ptr);
+    MY_ASSERT (collision_arr, "HT_Count_Collisions ()", FUNC_ERROR, ERROR);
+
+    const char path[] = "./Hash_Research/";
     const char *hash_func_name = names_arr[ht_ptr->hash_func_name];
     const char extension[] = ".txt";
 
-    size_t file_name_len = sizeof path + strlen (hash_func_name) + sizeof extension;
-    char *file_name = (char *)calloc (file_name_len, sizeof (char));
-
-    Name_Gen (file_name, path, hash_func_name, extension);
-
-    size_t *collision_arr = HT_Count_Collisions (ht_ptr);
-    MY_ASSERT (collision_arr, "HT_Count_Collisions ()", FUNC_ERROR, ERROR);
+    char *file_name = Name_Gen (path, hash_func_name, extension);    
 
     FILE *file = Open_File (file_name, "wb");
     MY_ASSERT (file, "Open_File ()", FUNC_ERROR, ERROR);
 
-    for (uint64_t cell_i = 0; cell_i < ht_ptr->size; cell_i++)
+    for (uint32_t cell_i = 0; cell_i < ht_ptr->size; cell_i++)
         fprintf (file, "%zd\n", collision_arr[cell_i]);
 
     Close_File (file, file_name);
     free (file_name);
 
-    Print_Histogram ("./src/Histogram.py", "./Hash_Research/", hash_func_name);
+    Print_Histogram ("./src/Histogram.py", path, hash_func_name);
 
     free (collision_arr);
 
@@ -189,3 +191,10 @@ int HT_Show_Collisons (const struct Hash_Table *ht_ptr)
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+
+void HT_Test (const struct Hash_Table *ht_ptr, char **words_arr, const int n_words, const int n_tests)
+{
+    for (int i = 0; i < n_tests; i++)
+        for (int word_i = 0; word_i < n_words; word_i++)
+            HT_Search (ht_ptr, words_arr[word_i]);
+}

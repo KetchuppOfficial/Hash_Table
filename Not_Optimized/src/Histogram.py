@@ -29,8 +29,9 @@ plt.xticks(np.arange(0, n_values + 1, step = 200), fontsize = 16)
 max_y = max(data)
 plt.ylabel("Number of elements", fontsize = 20)
 plt.ylim(0, 1.1 * max_y)
-
 plt.yticks(np.arange(0, max_y, step = int(max_y // 10)), fontsize = 16)
+
+plt.text(n_values - 500, max_y, "Max collisions: %d" %max_y, fontsize = 20)
 
 plt.savefig(graph_path + graph_name + ".png")
 

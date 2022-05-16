@@ -21,14 +21,15 @@ enum Hash_Func
     LEN_HASH,
     CHECKSUM,
     DED_HASH,
+    CRC_32,
     SHA_256
 };
 
 struct Hash_Table
 {
     struct Node **array;
-    uint64_t (* hash_func)(const char *);
-    uint64_t size;
+    uint32_t (* hash_func)(const char *);
+    uint32_t size;
     enum Hash_Func hash_func_name;
 };
 
@@ -44,16 +45,17 @@ enum Status
     NOT_FOUND = -1
 };
 
-struct Hash_Table *HT_Ctor (enum Hash_Func function, const uint64_t ht_size);
+struct Hash_Table *HT_Ctor (enum Hash_Func function, const uint32_t ht_size);
 int                HT_Dtor (struct Hash_Table *ht_ptr);
 
-int HT_Insert (struct Hash_Table *ht_ptr, const char *const data);
-int HT_Delete (struct Hash_Table *ht_ptr, const char *const data);
-int HT_Search (const struct Hash_Table *ht_ptr, const char *const data);
+char *HT_Insert (struct Hash_Table *const ht_ptr, const char *const data);
+int HT_Delete   (struct Hash_Table *const ht_ptr, const char *const data);
+int HT_Search   (const struct Hash_Table *const ht_ptr, const char *const data);
 
 int HT_Dump (const struct Hash_Table *ht_ptr);
 
-int HT_Fill (struct Hash_Table *ht_ptr, const char *file_name);
+char **HT_Fill (struct Hash_Table *ht_ptr, const char *file_name, int *n_words);
 int HT_Show_Collisons (const struct Hash_Table *ht_ptr);
+void HT_Test (const struct Hash_Table *ht_ptr, char **words_arr, const int n_words, const int n_tests);
 
 #endif

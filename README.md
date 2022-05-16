@@ -9,6 +9,7 @@
     3. [Len_Hash](#lenhash)
     4. [Checksum](#checksum)
     5. [Ded_Hash](#dedhash)
+    6. [CRC_32]()
     6. [SHA_256](#sha256)
     7. [Conclusion](#conclusion)
 5. [Hash table optimizaton](#hash-table-optimization)
@@ -21,7 +22,7 @@
 
 # General information
 
-This project is a C implementation of *hash table* - a well known data structure. My hash table supports 6 hash functions which quality were carefully studied and are presented below. A unique feature of this project is its second part - optimization of hash table with the help of knowledge in processor architecture.
+This project is a C implementation of *hash table* - a well known data structure. My hash table supports 7 hash functions which quality were carefully studied and are presented below. A unique feature of this project is its second part - optimization of hash table with the help of knowledge in processor architecture.
 
 # Building
 
@@ -119,6 +120,8 @@ static uint64_t Cringe_1 (const char *data)
 
 ![Cringe_1](Not_Optimized/Hash_Research/Cringe-1.png)
 
+This function is obviously the worst hash function ever because only one list is filled with elements.
+
 ## ASCII_Hash
 
 Returns ASCII-code of the first letter of a string.
@@ -131,6 +134,8 @@ static uint64_t ASCII_Hash (const char *data)
 
 ![ASCII_HASH](Not_Optimized/Hash_Research/ASCII-Hash.png)
 
+    Although **ASCII_Hash** is better than **Cringe_1**, it is not of a high quality because there is a great number of emply lists in the hash table.
+
 ## Len_Hash
 
 Returns the length of a string.
@@ -142,6 +147,8 @@ static uint64_t Len_Hash (const char *data)
 ```
 
 ![Len_Hash](Not_Optimized/Hash_Research/Len-Hash.png)
+
+**Len_Hash** is even worse than **ASCII_HASH**: the number of empty lists increased.
 
 ## Checksum
 
@@ -159,6 +166,8 @@ static uint64_t Checksum (const char *data)
 ```
 
 ![Checksum](Not_Optimized/Hash_Research/Checksum.png)
+
+**Checksum** is definitely better than previous hash functions, but it's not good enough too. Distribution of data by lists is not uniform.
 
 ## Ded_Hash
 
@@ -180,6 +189,14 @@ static uint64_t Ded_Hash (const char *data)
 }
 ```
 
+## CRC-32
+
+Implementation of **CRC_32** can be seen [here](Not_Optimized/src/Hash_Table.c)
+
+![CRC_32](Not_Optimized/Hash_Research/CRC-32.png)
+
+**CRC_32** have shown the best result among previous hash functions. The maximum number of collisions is of the same order as the load factor.
+
 ![Ded_Hash](Not_Optimized/Hash_Research/Ded-Hash.png)
 
 ## SHA-256
@@ -190,9 +207,13 @@ Implementation of this function can be seen on the GitHub page of my SHA-256.
 
 ![SHA_256](Not_Optimized/Hash_Research/SHA-256.png)
 
+There is no qualitative difference between **SHA_256** and **CRC_32**
+
 ## Conclusion
 
-SHA-256 has shown the best result. Nevertheless, Ded_Hash is in second place. Because the algorithm of SHA-256 is kind of difficult, we will use Ded_Hash at the second part of the work.
+**SHA-256** and **CRC-32** have shown the best result. As far as the algorithm of **SHA-256** is kind of difficult, we will use **CRC-32** at the second part of the work.
+
+# !!! STOP HERE. THE NEXT PART IS NOT READY YET !!!
 
 # Hash table optimization
 

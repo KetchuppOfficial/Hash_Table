@@ -110,7 +110,7 @@ int HT_Dump (const struct Hash_Table *ht_ptr)
                                 "\tgraph [dpi = 200]\n"
                                 "\tsplines = ortho\n"
                                 "\tnode [shape = box, style = filled];\n"
-                                "\tsize [shape = record, fillcolor = springgreen, label = \"<0> SIZE | <1> %lu\"];\n"
+                                "\tsize [shape = record, fillcolor = springgreen, label = \"<0> SIZE | <1> %u\"];\n"
                                 "\tsubgraph Array\n"
                                 "\t{\n"
                                     "\t\tbgcolor = gray70;\n"
