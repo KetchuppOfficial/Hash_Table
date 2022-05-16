@@ -22,7 +22,7 @@
 
 # General information
 
-This project is a C implementation of *hash table* - a well known data structure. My hash table supports 7 hash functions which quality were carefully studied and are presented below. A unique feature of this project is its second part - optimization of hash table with the help of knowledge in processor architecture.
+This project is a C implementation of *hash table* - a well known data structure. My hash table supports 7 hash functions, which quality were carefully studied and are presented below. A unique feature of this project is its second part - optimization of hash table with the help of knowledge in processor architecture.
 
 # Building
 
@@ -102,7 +102,7 @@ MY_LIB_PATH  = /home/ketchupp/Programming/My_Lib/       # <---- and here
 
 # Hash functions research
 
-**Experiment conditions.** Hash table was filled with words of *"The Lord of the Rings"*. If a word has already been added, it won't be added again. Sequently each word differs from others. It means that this experiment is a way to estimate the quality of a hash function.
+**Experiment conditions.** Hash table was filled with words of *"The Lord of the Rings"*. If a word has already been added, it won't be added again. Consequently each word differs from others. It means that this experiment is a way to estimate the quality of a hash function.
 
 My program calculates the number of collisions in every bucket and prints it into a .txt file. This data is visualized with the help of **python**. You can see information about hash functions, that were used, below.
 
@@ -134,7 +134,7 @@ static uint64_t ASCII_Hash (const char *data)
 
 ![ASCII_HASH](Not_Optimized/Hash_Research/ASCII-Hash.png)
 
-Although **ASCII_Hash** is better than **Cringe_1**, it is not of a high quality because there is a great number of emply lists in the hash table.
+Although **ASCII_Hash** is better than **Cringe_1**, it is not of a high quality because there is a great number of empty lists in the hash table.
 
 ## Len_Hash
 
@@ -189,15 +189,15 @@ static uint64_t Ded_Hash (const char *data)
 }
 ```
 
+![Ded_Hash](Not_Optimized/Hash_Research/Ded-Hash.png)
+
 ## CRC-32
 
-Implementation of **CRC_32** can be seen [here](Not_Optimized/src/Hash_Table.c)
+Implementation of **CRC_32** can be seen [here](Not_Optimized/src/Hash_Table.c).
 
 ![CRC_32](Not_Optimized/Hash_Research/CRC-32.png)
 
 **CRC_32** have shown the best result among previous hash functions. The maximum number of collisions is of the same order as the load factor.
-
-![Ded_Hash](Not_Optimized/Hash_Research/Ded-Hash.png)
 
 ## SHA-256
 
