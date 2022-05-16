@@ -1,36 +1,54 @@
-CC = gcc
-CFLAGS = -c -g -Wall -Werror -Wshadow -Wfloat-equal -Wswitch-default
+CC     = gcc
+CFLAGS = -Wall -Werror -Wshadow -Wfloat-equal -Wswitch-default
 
-SHA_LIB = ../../../../SHA_256/sha_256.a
-MY_LIB  = ../../../../My_Lib/My_Lib.a
+DBG = -g
 
-OBJECTS = main.o Hash_Table.o Fill_Hash_Table.o
+MY_LIB_PATH  = /home/ketchupp/Programming/My_Lib/
+MY_LIB  = $(join $(MY_LIB_PATH), My_Lib.a)
 
-OPT = 
+BIN      = ./bin/
+SRCDIR   = ./src/
+BUILDDIR = ./build/
 
-all: Hash_Table
+SRC_LIST = main.c Hash_Table.c Fill_Hash_Table.c
+SRC = $(addprefix $(SRCDIR),$(SRC_LIST))
 
-Hash_Table: $(OBJECTS)
-	$(CC) $(OBJECTS) $(SHA_LIB) $(MY_LIB) -o Hash_Table.out
-	rm $(OBJECTS)
+SUBS := $(SRC)
+SUBS := $(subst $(SRCDIR), $(BUILDDIR), $(SUBS))
 
-main.o:
-	$(CC) $(CFLAGS) main.c $(OPT) -o main.o
+OBJ  = $(SUBS:.c=.o)
+DEPS = $(SUBS:.c=.d)
 
-Hash_Table.o:
-	$(CC) $(CFLAGS) Hash_Table_V0.c $(OPT) -o Hash_Table.o
+.PHONY: all
 
-Fill_Hash_Table.o:
-	$(CC) $(CFLAGS) Fill_Hash_Table_V0.c $(OPT) -o Fill_Hash_Table.o
+all: $(DEPS) $(OBJ)
+	@mkdir -p $(BIN)
+	@echo "Linking project..."
+	@$(CC) $(OBJ) $(MY_LIB) -o $(BIN)Hash_Table.out
 
-run:
-	./Hash_Table.out
+$(BUILDDIR)%.o: $(SRCDIR)%.c
+	@mkdir -p $(dir $@)
+	@echo "Compiling \"$<\"..."
+	@$(CC) $(CFLAGS) -I$(MY_LIB_PATH) $(DBG) $(OPT) -c $< -o $@
+
+include $(DEPS)
+
+$(BUILDDIR)%.d: $(SRCDIR)%.c
+	@mkdir -p $(dir $@)
+	@echo "Collecting dependencies for \"$<\"..."
+	@$(CC) -E $(CFLAGS) -I$(MY_LIB_PATH) $< -MM -MT $(@:.d=.o) > $@	
+
+.PHONY: clean run profile
+
+run: $(BIN)Hash_Table.out
+	@echo "Running \"$<\"..."
+	@$(BIN)Hash_Table.out
 
 clean:
-	rm Hash_Table.out
-	rm -f log_file.log
+	rm -rf $(OBJ) $(DEPS)
 
-profile:
-	valgrind --tool=callgrind ./Hash_Table.out
-	kcachegrind
-	rm callgrind.out.*
+profile: $(BIN)Hash_Table.out
+	@echo "Profiling \"$<\"..."
+	@valgrind --tool=callgrind $(BIN)Hash_Table.out
+	@kcachegrind
+	@rm -rf callgrind.out.*

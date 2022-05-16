@@ -213,29 +213,52 @@ There is no qualitative difference between **SHA_256** and **CRC_32**.
 
 **SHA-256** and **CRC-32** have shown the best result. As far as the algorithm of **SHA-256** is kind of difficult, we will use **CRC-32** at the second part of the work.
 
-# !!! STOP HERE. THE NEXT PART IS NOT READY YET !!!
-
 # Hash table optimization
 
-I used *callgrind* to get profiling data and *kcachegrind* to visualize it. There are some references to "clock signals" below. It means processor clock signals I got information about from the lower line of *kcachegrind* window.
+The hash table is known for quick search of data. Thus, I implemented a test that loads **HT_Search** function to the maximum.
+
+I used **callgrind** to get profiling data and **kcachegrind** to visualize it. There are some references to "clock signals" below. It means processor clock signals I got information about from the lower line of **kcachegrind** window.
 
 ## Version 0
 
-There are no optimizations in this version. It differs from hash table from [Not_Optimized](Not_Optimized) folder in some ways, but these differences are minor (dump and counting collisions were removed, for example). It takes 290 210 517 clock signals to execute this program. Let's think how can we optimize the hash table to make it work faster.
+There are no optimizations in this version. Nevertheless, it differs from [Not_Optimized](Not_Optimized) version of the hash table in some ways. All differences are: 
 
-As we see in the picture below, execution of *Divide_In_Words* takes the longest time. 
+1) All hash functions except **CRC-32** were removed;
+2) Dumping hash table and making bar charts in not supported;
+3) Stress test added.
 
-![Version_0](Optimized/Version_0/Version_0.png)
+As we see in the picture below, execution of *crc_32_* takes the longest time.
 
-It seems logical to optimize this very function at first. Nevertheless, if we look at the callee map, we can see that *Divide_In_Words* calls *Insert_Words*. This function itself calls *HT_Search* and *HT_Inset*:
+![profiling_data_0](/Optimized/Version_0/pictures/profiling_data.png)
+![all_profiling_data_0](/Optimized/Version_0/pictures/all_profiling_data.png)
 
-![Insert_Words_V0](Optimized/Version_0/Insert_Word.png)
+The performance of the hash table was also measured by the tool **time**.
 
-It looks like we've found a function to optimize. It should he *HT_Search*. But may we dig a little dipper and see which functions are called by *HT_Search*.
+Execution time:
 
-![HT_Search_V0](Optimized/Version_0/HT_Search.png)
+|   real   |   user   |   sys    |
+|----------|----------|----------|
+| 0m3,418s | 0m3,406s | 0m0,008s |
+| 0m3,440s | 0m3,433s | 0m0,004s |
+| 0m3,366s | 0m3,359s | 0m0,004s |
+| 0m3,382s | 0m3,371s | 0m0,008s |
+| 0m3,425s | 0m3,422s | 0m0,000s |
+| 0m3,409s | 0m3,402s | 0m0,004s |
+| 0m3,358s | 0m3,347s | 0m0,008s |
+| 0m3,373s | 0m3,362s | 0m0,008s |
+| 0m3,463s | 0m3,455s | 0m0,005s |
+| 0m3,523s | 0m3,511s | 0m0,009s |
+|----------|----------|----------|
 
-It turns out *HT_Search* calls *Ded_Hash* and some nonsense (it is *_strncmp_avx2* actually). We finally identified which functions are the slowest, so let's optimize them. I consider doing it gradually is a good idea. We will optimize *Ded_Hash* and *strncmp* after that. Then we will see which optimization made the greatest contribution to speeding hash table up.
+Average execution time:
+
+|   real   |   user   |   sys    |
+|----------|----------|----------|
+| 0m3,416s | 0m3,407s | 0m0,006s |
+
+As we see in the profiling data, sorted by the field *Self*, **crc_32_** function takes the longest time. That's why we will optimize this exact function. 
+
+# !!! STOP HERE. THE NEXT PART IS NOT READY YET !!!
 
 ## Version 1
 

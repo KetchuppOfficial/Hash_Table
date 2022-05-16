@@ -189,12 +189,4 @@ int HT_Show_Collisons (const struct Hash_Table *ht_ptr)
 
     return NO_ERRORS;
 }
-
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-
-void HT_Test (const struct Hash_Table *ht_ptr, char **words_arr, const int n_words, const int n_tests)
-{
-    for (int i = 0; i < n_tests; i++)
-        for (int word_i = 0; word_i < n_words; word_i++)
-            HT_Search (ht_ptr, words_arr[word_i]);
-}

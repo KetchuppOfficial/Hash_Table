@@ -49,9 +49,3 @@ run: $(BIN)Hash_Table.out
 
 clean:
 	rm -rf $(OBJ) $(DEPS)
-
-profile: $(BIN)Hash_Table.out
-	@echo "Profiling \"$<\"..."
-	@valgrind --tool=callgrind $(BIN)Hash_Table.out
-	@kcachegrind
-	@rm -rf callgrind.out.*
