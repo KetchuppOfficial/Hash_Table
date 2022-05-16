@@ -134,7 +134,7 @@ static uint64_t ASCII_Hash (const char *data)
 
 ![ASCII_HASH](Not_Optimized/Hash_Research/ASCII-Hash.png)
 
-    Although **ASCII_Hash** is better than **Cringe_1**, it is not of a high quality because there is a great number of emply lists in the hash table.
+Although **ASCII_Hash** is better than **Cringe_1**, it is not of a high quality because there is a great number of emply lists in the hash table.
 
 ## Len_Hash
 
