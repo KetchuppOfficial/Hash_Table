@@ -215,9 +215,9 @@ There is no qualitative difference between **SHA_256** and **CRC_32**.
 
 # Hash table optimization
 
-The hash table is known for quick search of data. Thus, I implemented a test that loads **HT_Search** function to the maximum.
+The hash table is known for quick search of data. Thus, I implemented a test that loads **HT_Search** function to the maximum. Test function searches every word in the hash table 1000 times.
 
-I used **callgrind** to get profiling data and **kcachegrind** to visualize it. There are some references to "clock signals" below. It means processor clock signals I got information about from the lower line of **kcachegrind** window.
+I used **callgrind** to get profiling data and **kcachegrind** to visualize it. There are some references to "clock signals" below. It means processor clock signals I got information about from the lower line of **kcachegrind** window. The performance of the hash table was also measured by the tool **time**.
 
 ## Version 0
 
@@ -231,8 +231,6 @@ As we see in the picture below, execution of *crc_32_* takes the longest time.
 
 ![profiling_data_0](/Optimized/Version_0/pictures/profiling_data.png)
 ![all_profiling_data_0](/Optimized/Version_0/pictures/all_profiling_data.png)
-
-The performance of the hash table was also measured by the tool **time**.
 
 Execution time:
 
