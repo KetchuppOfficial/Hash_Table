@@ -112,7 +112,7 @@ The size of the hash table was chosen to be 2000 so that the load factor is appr
 
 Returns 1 regardless of input data.
 ```C
-static uint64_t Cringe_1 (const char *data)
+static inline uint32_t Cringe_1 (const char *data)
 {
     return 1;
 }
@@ -126,9 +126,9 @@ This function is obviously the worst hash function ever because only one list is
 
 Returns ASCII-code of the first letter of a string.
 ```C
-static uint64_t ASCII_Hash (const char *data)
+static inline uint32_t ASCII_Hash (const char *data)
 {
-    return (uint64_t)data[0];
+    return (uint32_t)data[0];
 }
 ```
 
@@ -140,7 +140,7 @@ Although **ASCII_Hash** is better than **Cringe_1**, it is not of a high quality
 
 Returns the length of a string.
 ```C
-static uint64_t Len_Hash (const char *data)
+static inline uint32_t Len_Hash (const char *data)
 {
     return strlen (data);
 }
@@ -154,9 +154,9 @@ static uint64_t Len_Hash (const char *data)
 
 Returns sum of ASCII-codes of letters of a string.
 ```C
-static uint64_t Checksum (const char *data)
+static inline uint32_t Checksum (const char *data)
 {
-    uint64_t checksum = 0U;
+    uint32_t checksum = 0U;
     
     for (int i = 0; data[i] != '\0'; i++)
         checksum += data[i];
@@ -173,17 +173,17 @@ static uint64_t Checksum (const char *data)
 
 This function is usually called **ror hash**, but in my work I named after my teacher[Ded](https://github.com/ded32), who told me about this function.
 ```C
-static inline uint64_t ror(uint64_t num, uint64_t shift)
+static inline uint32_t ror_32 (uint32_t num, uint32_t shift)
 {
-    return (num >> shift) | (num << (64 - shift));
+    return (num >> shift) | (num << (__CHAR_BIT__ * sizeof (uint32_t) - shift));
 }
 
-static uint64_t Ded_Hash (const char *data)
+static inline uint32_t Ded_Hash (const char *data)
 {
-    uint64_t hash = data[0];
+    uint32_t hash = data[0];
 
     for (int i = 0; data[i] != '\0'; i++)
-        hash = ror (hash, 1) ^ data[i];
+        hash = ror_32 (hash, 1) ^ data[i];
 
     return hash;
 }
@@ -202,8 +202,6 @@ An implementation of **CRC_32** can be seen [here](Not_Optimized/src/Hash_Table.
 ## SHA-256
 
 An implementation of this function can be seen on the GitHub page of my SHA-256.
-
-**Hash table size:** 2000 cells
 
 ![SHA_256](Not_Optimized/Hash_Research/SHA-256.png)
 
