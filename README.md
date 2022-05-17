@@ -245,25 +245,25 @@ As we see in the profiling data, sorted by the field *Self*, **crc_32_** functio
 I've chosen to optimize **crc_32_** using GNU inline assembler. So I implemented crc-32 algorithm in **HT_Search**, **HT_Insert** and **HT_Delete** as in the example below:
 ```C
 uint32_t hash = 0;
-    size_t len = strlen (data);
+size_t len = strlen (data);
 
-    // Calculates crc-32
-    __asm__(
-        "movl $0xFFFFFFFF, %%ebx\n\t"
-        "xorq %%rcx, %%rcx\n\t"
-        ".search_while:\n\t"
-        "    crc32b (%1, %%rcx), %%ebx\n\t"
-        "    inc %%rcx\n\t"
-        "    cmp %2, %%rcx\n\t"
-        "    jb .search_while\n\t"
-        "xorl $0xFFFFFFFF, %%ebx\n\t"
-        "movl %%ebx, %0\n\t"
-        :"=r"(hash)
-        :"r"(data), "r"(len)
-        :"%rcx", "%ebx"
-    );
+// Calculates crc-32
+__asm__(
+    "movl $0xFFFFFFFF, %%ebx\n\t"
+    "xorq %%rcx, %%rcx\n\t"
+    ".search_while:\n\t"
+    "    crc32b (%1, %%rcx), %%ebx\n\t"
+    "    inc %%rcx\n\t"
+    "    cmp %2, %%rcx\n\t"
+    "    jb .search_while\n\t"
+    "xorl $0xFFFFFFFF, %%ebx\n\t"
+    "movl %%ebx, %0\n\t"
+    :"=r"(hash)
+    :"r"(data), "r"(len)
+    :"%rcx", "%ebx"
+);
 
-    hash = hash % ht_ptr->size;
+hash = hash % ht_ptr->size;
 ```
 
 Let's see in the profiling data.
