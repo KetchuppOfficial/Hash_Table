@@ -11,7 +11,6 @@ struct Hash_Table
 {
     struct Node **array;
     uint32_t size;
-    enum Hash_Func hash_func_name;
 };
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -75,13 +74,14 @@ static inline uint32_t crc_32 (const char *data)
 {
     return crc_32_ ((uint8_t *)data, strlen (data));
 }
+
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //                                  CONSTRUCTORS AND DESTRUCTORS                                  //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 
-struct Hash_Table *HT_Ctor (enum Hash_Func function, const uint32_t ht_size)
+struct Hash_Table *HT_Ctor (const uint32_t ht_size)
 {
     MY_ASSERT (ht_size > 0, "const uint32_t ht_size", POS_VAL, NULL);
     
@@ -170,7 +170,7 @@ char *HT_Insert (struct Hash_Table *ht_ptr, const char *const data)
     if (ht_ptr->array[hash] == NULL)
     {
         ht_ptr->array[hash] = Add_Node (data);
-        MY_ASSERT (ht_ptr->array[hash], "Add_Node ()", FUNC_ERROR, ERROR);
+        MY_ASSERT (ht_ptr->array[hash], "Add_Node ()", FUNC_ERROR, NULL);
     }
     else
     {

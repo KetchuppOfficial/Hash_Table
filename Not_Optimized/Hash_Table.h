@@ -56,6 +56,5 @@ int HT_Dump (const struct Hash_Table *ht_ptr);
 
 char **HT_Fill (struct Hash_Table *ht_ptr, const char *file_name, int *n_words);
 int HT_Show_Collisons (const struct Hash_Table *ht_ptr);
-void HT_Test (const struct Hash_Table *ht_ptr, char **words_arr, const int n_words, const int n_tests);
 
 #endif

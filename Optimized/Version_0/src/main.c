@@ -11,12 +11,12 @@ int main (void)
     OPEN_LOG_FILE;
     #endif
 
-    struct Hash_Table *ht_ptr = HT_Ctor (CRC_32, 2000);
+    struct Hash_Table *ht_ptr = HT_Ctor (2000);
     
     int n_words = 0;
     char **words_arr = HT_Fill (ht_ptr, text, &n_words);
 
-    HT_Test (ht_ptr, words_arr, n_words, 1000);
+    HT_Test (ht_ptr, words_arr, n_words, 5000);
 
     free (words_arr);
 
