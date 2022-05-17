@@ -270,7 +270,7 @@ Let's see in the profiling data.
 
 ![profiling_data_1](/Optimized/Version_1/pictures/profiling_data.png)
 
-There is no **crc_32_** at the top of the list. It means, it was worth using inline assembler.
+There is no **crc_32_** at the top of the list. It means, it was worth using inline assembler. However, the *self* execution time of **HT_Search** insreased. It happened because **crc_32_** was inlined in **HT_Search**.
 
 It takes 28 380 391 496 clock ticks to execute the program.
 
