@@ -228,7 +228,6 @@ There are no optimizations in this version. Nevertheless, it differs from [Not_O
 As we see in the picture below, execution of *crc_32_* takes the longest time.
 
 ![profiling_data_0](/Optimized/Version_0/pictures/profiling_data.png)
-![all_profiling_data_0](/Optimized/Version_0/pictures/all_profiling_data.png)
 
 It takes 40 081 087 077 clock ticks to execute the program.
 
@@ -270,7 +269,6 @@ uint32_t hash = 0;
 Let's see in the profiling data.
 
 ![profiling_data_1](/Optimized/Version_1/pictures/profiling_data.png)
-![all_profiling_data_1](/Optimized/Version_1/pictures/all_profiling_data.png)
 
 There is no **crc_32_** at the top of the list. It means, it was worth using inline assembler.
 
