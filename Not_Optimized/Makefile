@@ -41,7 +41,7 @@ $(BUILDDIR)%.d: $(SRCDIR)%.c
 	@echo "Collecting dependencies for \"$<\"..."
 	@$(CC) -E $(CFLAGS) -I$(SHA_LIB_PATH) -I$(MY_LIB_PATH) $< -MM -MT $(@:.d=.o) > $@	
 
-.PHONY: clean run profile
+.PHONY: clean run
 
 run: $(BIN)Hash_Table.out
 	@echo "Running \"$<\"..."
