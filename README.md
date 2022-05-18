@@ -106,7 +106,7 @@ MY_LIB_PATH  = /home/ketchupp/Programming/My_Lib/       # <---- and here
 
 My program calculates the number of collisions in every bucket and prints it into a .txt file. This data is visualized with the help of **python**. You can see information about hash functions, that were used, below.
 
-The size of the hash table was chosen to be 2000 so that the load factor is approximately 8,24.
+The size of the hash table was chosen to be 2000 so that the load factor is approximately 8,24. The maximum value on the Ox axis of the first 3 bar charts is 500 instead of 2000. That's because there was no words in hash table buckets with indexes [500, ..., 1999] while using first 3 hash functions.
 
 ## Cringe_1
 
