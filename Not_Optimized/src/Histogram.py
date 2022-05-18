@@ -15,23 +15,19 @@ def N_Digits (n):
 # =========================================
 
 # =========================================
-def Get_Round_Step (val):
+def Get_Axis_Step (val):
 
     n_digits = N_Digits (val)
     pow_10 = 10 ** (n_digits - 1)
 
-    first_digit = val // pow_10
-    ceil = (first_digit + 1) * pow_10
-
     if val > 5 * pow_10:
-        floor = pow_10
+        step = pow_10
+    elif val > 2.5 * pow_10:
+        step = pow_10 // 2
     else:
-        if first_digit == 1:
-            floor = pow_10 // 4
-        else:
-            floor = pow_10 // 2
+        step = pow_10 // 4
 
-    return floor
+    return step
 # =========================================
 
 
@@ -59,14 +55,14 @@ def main (argv):
     plt.xlabel("Bucket number", fontsize = 20)
     plt.xlim(-10, n_values + 10)
 
-    step_x = Get_Round_Step (n_values)
+    step_x = Get_Axis_Step (n_values)
     plt.xticks(np.arange(0, n_values + 1, step = step_x), fontsize = 16)
 
     max_y = max(data)
     plt.ylabel("Number of elements", fontsize = 20)
     plt.ylim(0, 1.1 * max_y)
 
-    step_y = Get_Round_Step (max_y)
+    step_y = Get_Axis_Step (max_y)
     plt.yticks(np.arange(0, max_y, step = step_y), fontsize = 16)
 
     plt.bar(x, data, width = 1, label = "Max collisions: %d" %max_y)
