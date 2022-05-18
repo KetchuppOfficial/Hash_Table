@@ -54,8 +54,6 @@ def main (argv):
 
     plt.figure (figsize = (16, 10), dpi = 80)
 
-    plt.bar(x, data, width = 1)
-
     plt.title(graph_name, fontsize = 40, loc = 'center')
 
     plt.xlabel("Bucket number", fontsize = 20)
@@ -71,7 +69,8 @@ def main (argv):
     step_y = Get_Round_Step (max_y)
     plt.yticks(np.arange(0, max_y, step = step_y), fontsize = 16)
 
-    plt.text(n_values - 500, max_y, "Max collisions: %d" %max_y, fontsize = 20)
+    plt.bar(x, data, width = 1, label = "Max collisions: %d" %max_y)
+    plt.legend(loc = 'best', fontsize = 20)
 
     plt.savefig(graph_path + graph_name + ".png")
 
