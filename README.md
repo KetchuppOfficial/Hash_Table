@@ -213,9 +213,9 @@ There is no qualitative difference between **SHA_256** and **CRC_32**.
 
 # Hash table optimization
 
-The hash table is known for quick search of data. Thus, I implemented a test that loads **HT_Search** function to the maximum. Test function searches every word in the hash table 5000 times.
+The hash table is known for quick search of data. Thus, I implemented a test that loads **HT_Search** function to the maximum. The test function searches every word in the hash table 5000 times.
 
-I used **callgrind** to get profiling data and **kcachegrind** to visualize it. There are some references to "clock signals" below. It means processor clock signals I got information about from the lower line of **kcachegrind** window. The performance of the hash table was also measured by the tool **time** that was ran by a bash script [measure.sh](/Optimized/measure.sh).
+I used **callgrind** to get profiling data and **kcachegrind** to visualize it. There are some references to "clock signals" below. It means processor clock signals I got information about from the lower line of **kcachegrind** window. The performance of the hash table was also measured by the tool **time** that was run by a bash script [measure.sh](/Optimized/measure.sh).
 
 Because the task obliges to implement one optimization with Intel<sup>&reg;</sup> Intrinsics, all optimized versions of the program were compiled with **-O1** optimization flag.
 
@@ -263,7 +263,7 @@ static int Fast_Cmp (const char *str_1, const char *str_2)
 
     !!! WARNING: if you want to use HT_Search to find a word, it must be of the size 32 + '\0' at the end (so, 33 characters in general).
 
-Because of fixating the length of strings that the hash table contain, there were also done some other changes in the code:
+Because of fixating the length of strings that the hash table contain, there were also made some other changes in the code:
 1) **len** field removed from **struct Node**;
 2) Measuring of a string length in **Add_Node** removed;
 3) **Insert_Word** doesn't put '\0' at the end of a string anymore;
@@ -285,7 +285,7 @@ Let's look at the profiling data and measurements of the execution time:
 
     Boost in clock ticks: 40,6%
 
-We can notice a strange thing in the profiling data. The number of *Self* clock ticks of **HT_Search** increased, although its code hasn't changed. I found the explanation after using tool **objdump** to look at the assembler. You can see difference between **HT_Search** of **Version_0** and of **Version_1** [here](/HT_Search.md). Long story short, the compiler inlined **Fast_Cmp** so the *Self* value of **HT_Search** includes that value of **Fast_Cmp**.
+We can notice a strange thing in the profiling data. The number of *Self* clock ticks of **HT_Search** increased, although its code hasn't changed. I found the explanation after using tool **objdump** to look at the assembler. You can see difference between **HT_Search** of **Version_0** and **HT_Search** of **Version_1** [here](/HT_Search.md). Long story short, the compiler inlined **Fast_Cmp** so the *Self* value of **HT_Search** includes that value of **Fast_Cmp**.
 
 Previous paragraph leads to the thought that we shouldn't optimize **HT_Search** now. Its *Self* value hasn't really changed and is still less than that value of **crc_32**. All in all, let's optimize **crc_32**.
 
@@ -312,10 +312,10 @@ __asm__(
 hash = hash % ht_ptr->size;
 ```
 
-This version of crc-32 can handle only 32-character strings. It allows us to get rid of cycle and make crc-32 even faster. I've also done one more change in the code because of new crc-32 algorithm:
+This version of crc-32 can handle only 32-character strings. It allows us to get rid of the cycle and make crc-32 even faster. I've also made one more change in the code because of new crc-32 algorithm:
 1) Memory for a new string is allocated in **HT_Insert**, not in **Add_Node**; its size if fixed: 32 + 1 bytes are allocated.
 
-Let's look at the result of optimization.
+Let's look at the results of optimization.
 
 ![profiling_data_1](/Optimized/Version_2/measurements/profiling_data.png)
 
@@ -331,7 +331,7 @@ Execution time:
 
     Boost in clock ticks: 49,8% (comparing to Version_1) or 70,2% (comapring to Version_0)
 
-I suppose there is no doubt the next function to optimize it HT_Search.
+I suppose there is no doubt the next function to optimize is HT_Search.
 
 # !!! THE NEXT PART IS NOT READY YET
 
