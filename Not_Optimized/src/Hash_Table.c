@@ -34,7 +34,7 @@ static inline uint32_t ror_32 (uint32_t num, uint32_t shift)
     return (num >> shift) | (num << (__CHAR_BIT__ * sizeof (uint32_t) - shift));
 }
 
-static inline uint32_t Ded_Hash (const char *data)
+static uint32_t Ded_Hash (const char *data)
 {
     uint32_t hash = data[0];
 
@@ -80,26 +80,24 @@ static const uint32_t crc_lookup_table[256] =
 	0x79B737BA, 0x8BDCB4B9, 0x988C474D, 0x6AE7C44E, 0xBE2DA0A5, 0x4C4623A6, 0x5F16D052, 0xAD7D5351  
 };
 
-static inline uint32_t crc_32_ (const uint8_t *data, size_t len)
+static uint32_t crc_32 (const char *data)
 {
     const uint32_t crc_32_magic_const = 0xFFFFFFFFU;
+
+    const uint8_t *udata = (uint8_t *)data;
+    const size_t len = strlen (data);
 
     uint32_t crc_32 = crc_32_magic_const;
 
 	for (size_t i = 0; i < len; i++)
     {
-        uint8_t lookup_i = (uint8_t)crc_32 ^ data[i];
+        uint32_t lookup_i = (uint8_t)crc_32 ^ udata[i];
         crc_32 = (crc_32 >> 8) ^ crc_lookup_table[lookup_i];
     }
 
     crc_32 ^= crc_32_magic_const;
     
     return crc_32;
-}
-
-static inline uint32_t crc_32 (const char *data)
-{
-    return crc_32_ ((uint8_t *)data, strlen (data));
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
