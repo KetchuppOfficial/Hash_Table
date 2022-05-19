@@ -14,18 +14,10 @@ callgrind.out.*
 
 *.txt
 !The Lord of the Rings.txt
+!time.txt
 #~~~~~~~~~~~~~
 
 # Not for release
 #~~~~~~~~~~~~~~~~
-Test/
-
-TODO
-
-strncmp.s
-Optimized/Version_Final/
-Optimized/Version_1_Old/
-Optimized/Version_2/
-Optimized/Version_3/
-Optimized/Version_4/
+Some_Asm/
 #~~~~~~~~~~~~~~~~

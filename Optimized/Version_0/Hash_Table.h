@@ -6,7 +6,7 @@
 #include <string.h>
 #include <ctype.h>
 
-#include "../../../../My_Lib/My_Lib.h"
+#include "My_Lib.h"
 
 #ifndef DEBUG
 #undef MY_ASSERT

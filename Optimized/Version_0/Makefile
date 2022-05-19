@@ -1,8 +1,6 @@
 CC     = gcc
 CFLAGS = -Wall -Werror -Wshadow -Wfloat-equal -Wswitch-default
 
-DBG = -g
-
 MY_LIB_PATH  = /home/ketchupp/Programming/My_Lib/
 MY_LIB  = $(join $(MY_LIB_PATH), My_Lib.a)
 
@@ -29,7 +27,7 @@ all: $(DEPS) $(OBJ)
 $(BUILDDIR)%.o: $(SRCDIR)%.c
 	@mkdir -p $(dir $@)
 	@echo "Compiling \"$<\"..."
-	@$(CC) $(CFLAGS) -I$(MY_LIB_PATH) $(DBG) $(OPT) -c $< -o $@
+	@$(CC) $(CFLAGS) -I$(MY_LIB_PATH) -c -g $(OPT) $< -o $@
 
 include $(DEPS)
 

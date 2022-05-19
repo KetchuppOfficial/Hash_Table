@@ -217,6 +217,8 @@ The hash table is known for quick search of data. Thus, I implemented a test tha
 
 I used **callgrind** to get profiling data and **kcachegrind** to visualize it. There are some references to "clock signals" below. It means processor clock signals I got information about from the lower line of **kcachegrind** window. The performance of the hash table was also measured by the tool **time** that was ran by a bash script [measure.sh](/Optimized/measure.sh).
 
+Because the task obliges to implement one optimization with Intel<sup>&reg;</sup> Intrinsics, all optimized versions of the program were compiled with **-O1** optimization flag.
+
 ## Version 0
 
 There are no optimizations in this version. Nevertheless, it differs from [Not_Optimized](Not_Optimized) version of the hash table in some ways. All differences are: 
@@ -225,67 +227,113 @@ There are no optimizations in this version. Nevertheless, it differs from [Not_O
 2) Dumping hash table and making bar charts in not supported;
 3) Stress test added.
 
-As we see in the picture below, execution of *crc_32_* takes the longest time.
+As we see in the picture below, execution of **crc_32** takes the longest time.
 
-![profiling_data_0](/Optimized/Version_0/pictures/profiling_data.png)
+![profiling_data_0](/Optimized/Version_0/measurements/profiling_data.png)
 
-It takes 40 081 087 077 clock ticks to execute the program.
-
-Execution time:
+**Performance**:
 
 |                       |   real   |   user   |
 |-----------------------|----------|----------|
-|    average time, s    |   10,4   |   10,4   |
-| standard deviation, s |    0,3   |    0,3   |
+|    average time, s    |   7.7    |   7.7    |
+| standard deviation, s |   0.1    |   0,1    |
+|     clock ticks       |    25 599 773 757   |
 
-As we see in the profiling data, sorted by the field *Self*, **crc_32_** function takes the longest time. That's why we will optimize this exact function. 
+Profiling data shows us that we should optimize **__memcmp_avx2_movbe**. Well, I haven't used this function in my program. It turns out **gcc** used **__memcmp_avx2_movbe** instead of **memcmp** to make memory comparison faster. I suppose I can do this job even better.
 
 ## Version 1
 
-I've chosen to optimize **crc_32_** using GNU inline assembler. So I implemented crc-32 algorithm in **HT_Search**, **HT_Insert** and **HT_Delete** as in the example below:
+My hash table contains English words. The maximum length of a word in *The Lord of the Rings* is 16 letters (we know it from results of **Len_Hash**). It means that, the probability that there will be more than 32 letters in a word of a fiction novel tends to 0. That's why there is no harm in implementing a function that compares only words of 32 letters. I've done so:
+
+```C
+#define RIGHT_MASK 0xFFFFFFFF
+static int Fast_Cmp (const char *str_1, const char *str_2)
+{      
+    __m256i STR_1 = _mm256_loadu_si256 ((__m256i *)(str_1));
+    __m256i STR_2 = _mm256_loadu_si256 ((__m256i *)(str_2));
+
+    __m256i mask_avx = _mm256_cmpeq_epi8 (STR_1, STR_2);
+    if (_mm256_movemask_epi8 (mask_avx) == RIGHT_MASK)
+        return 0;
+
+    return 1;
+}
+#undef RIGHT_MASK
+```
+
+    !!! WARNING: if you want to use HT_Search to find a word, it must be of the size 32 + '\0' at the end (so, 33 characters in general).
+
+Because of fixating the length of strings that the hash table contain, there were also done some other changes in the code:
+1) **len** field removed from **struct Node**;
+2) Measuring of a string length in **Add_Node** removed;
+3) **Insert_Word** doesn't put '\0' at the end of a string anymore;
+4) **Divide_In_Words** cleans the whole **str** buffer.
+
+Let's look at the profiling data and measurements of the execution time:
+
+![profiling_data_1](/Optimized/Version_1/measurements/profiling_data.png)
+
+**Performance**:
+
+|                       |   real   |   user   |
+|-----------------------|----------|----------|
+|    average time, s    |   7.2    |   7.2    |
+| standard deviation, s |   0.3    |   0,3    |
+|     clock ticks       |    15 198 642 300   |
+
+    Boost in time: 6,5%
+
+    Boost in clock ticks: 40,6%
+
+We can notice a strange thing in the profiling data. The number of *Self* clock ticks of **HT_Search** increased, although its code hasn't changed. I found the explanation after using tool **objdump** to look at the assembler. You can see difference between **HT_Search** of **Version_0** and of **Version_1** [here](/HT_Search.md). Long story short, the compiler inlined **Fast_Cmp** so the *Self* value of **HT_Search** includes that value of **Fast_Cmp**.
+
+Previous paragraph leads to the thought that we shouldn't optimize **HT_Search** now. Its *Self* value hasn't really changed and is still less than that value of **crc_32**. All in all, let's optimize **crc_32**.
+
+## Version 2
+
+I've chosen to optimize **crc_32** using GNU inline assembler. So I implemented crc-32 algorithm in **HT_Search**, **HT_Insert** and **HT_Delete** as in the example below:
 ```C
 uint32_t hash = 0;
-size_t len = strlen (data);
 
 // Calculates crc-32
 __asm__(
-    "movl $0xFFFFFFFF, %%ebx\n\t"
-    "xorq %%rcx, %%rcx\n\t"
-    ".search_while:\n\t"
-    "    crc32b (%1, %%rcx), %%ebx\n\t"
-    "    inc %%rcx\n\t"
-    "    cmp %2, %%rcx\n\t"
-    "    jb .search_while\n\t"
-    "xorl $0xFFFFFFFF, %%ebx\n\t"
-    "movl %%ebx, %0\n\t"
+    "movq $0xFFFFFFFFFFFFFFFF, %%rax\n\t"
+    "crc32q (%1),     %%rax\n\t"
+    "crc32q 0x08(%1), %%rax\n\t"
+    "crc32q 0x10(%1), %%rax\n\t"
+    "crc32q 0x18(%1), %%rax\n\t"
+    "not %%rax\n\t"
+    "movl %%eax, %0\n\t"
     :"=r"(hash)
-    :"r"(data), "r"(len)
-    :"%rcx", "%ebx"
+    :"r"(str)
+    :"%rax"
 );
 
 hash = hash % ht_ptr->size;
 ```
 
-Let's see in the profiling data.
+This version of crc-32 can handle only 32-character strings. It allows us to get rid of cycle and make crc-32 even faster. I've also done one more change in the code because of new crc-32 algorithm:
+1) Memory for a new string is allocated in **HT_Insert**, not in **Add_Node**; its size if fixed: 32 + 1 bytes are allocated.
 
-![profiling_data_1](/Optimized/Version_1/pictures/profiling_data.png)
+Let's look at the result of optimization.
 
-There is no **crc_32_** at the top of the list. It means, it was worth using inline assembler. However, the *self* execution time of **HT_Search** insreased. It happened because **crc_32_** was inlined in **HT_Search**.
-
-It takes 28 380 391 496 clock ticks to execute the program.
+![profiling_data_1](/Optimized/Version_2/measurements/profiling_data.png)
 
 Execution time:
 
 |                       |   real   |   user   |
 |-----------------------|----------|----------|
-|    average time, s    |   7,7    |   7,7    |
-| standard deviation, s |   0,2    |   0,2    |
+|    average time, s    |   4,53   |   4.52   |
+| standard deviation, s |   0,14   |   0,14   |
+|     clock ticks       |    7 623 297 279    |
 
-We've got approximatale 26% boost in time and 29% boost in the number of clock ticks. It seems to be a good result.
+    Boost in time: 37,1% (comaring to Version_1) or 41,2% (comaring to Version_0)
 
-Profiling data shows us that we should optimize **__memcmp_avx2_movbe** next. Well, I haven't used this function in my program. It turns out **gcc** used **__memcmp_avx2_movbe** instead of **memcmp** to make memory comparison faster. I suppose I can do this job even better.
+    Boost in clock ticks: 49,8% (comparing to Version_1) or 70,2% (comapring to Version_0)
 
-# !!! STOP HERE. THE NEXT PART IS NOT READY YET
+I suppose there is no doubt the next function to optimize it HT_Search.
+
+# !!! THE NEXT PART IS NOT READY YET
 
 ## Version 2
 
