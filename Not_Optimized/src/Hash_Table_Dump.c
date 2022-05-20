@@ -12,60 +12,60 @@ const char dump_file_name[] = "Dump.png";
 //                                              DUMP                                             //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 
-static void Print_List (FILE *file, struct Node *node_ptr, const uint64_t cell_i)
+static void Print_List (FILE *file, struct Node *node_ptr, const uint32_t cell_i)
 {
     struct Node *current = node_ptr;
     struct Node *next = node_ptr->next;
     
-    int node_i = 0;
+    uint32_t node_i = 0;
     for ( ; next != NULL; node_i++)
     {
-        fprintf (file, "\t\t\tstring%lu_%d [label = \"%s\", color = lightskyblue];\n", cell_i, node_i, current->data);
+        fprintf (file, "\t\t\tstring%u_%u [label = \"%s\", color = lightskyblue];\n", cell_i, node_i, current->data);
 
         current = next;
         next = current->next;
     }
 
-    fprintf (file, "\t\t\tstring%lu_%d [label = \"%s\", color = lightskyblue];\n", cell_i, node_i, current->data);
+    fprintf (file, "\t\t\tstring%u_%u [label = \"%s\", color = lightskyblue];\n", cell_i, node_i, current->data);
 }
 
 static void Print_HT (FILE *file, const struct Hash_Table *ht_ptr)
 {
-    for (uint64_t cell_i = 0; cell_i < ht_ptr->size; cell_i++)
+    for (uint32_t cell_i = 0; cell_i < ht_ptr->size; cell_i++)
     {        
         if (ht_ptr->array[cell_i] != NULL)
         {
-            fprintf (file, "\t\tsubgraph bucket%lu\n"
+            fprintf (file, "\t\tsubgraph bucket%u\n"
                            "\t\t{\n"
                            "\t\t\trankdir=TB\n", cell_i);
             
-            fprintf (file, "\t\t\tnode%lu [label = \"[%lu]\", fillcolor = aquamarine];\n", cell_i, cell_i);
+            fprintf (file, "\t\t\tnode%u [label = \"[%u]\", fillcolor = aquamarine];\n", cell_i, cell_i);
             Print_List (file, ht_ptr->array[cell_i], cell_i);
 
             fprintf (file, "\t\t}\n\n");
         }
         else
-            fprintf (file, "\t\tnode%lu [label = \"[%lu]\", fillcolor = aquamarine];\n\n", cell_i, cell_i);
+            fprintf (file, "\t\tnode%u [label = \"[%u]\", fillcolor = aquamarine];\n\n", cell_i, cell_i);
     }
 }
 
 static void Print_Arrows (FILE *file, const struct Hash_Table *ht_ptr)
 {
-    for (uint64_t cell_i = 0; cell_i < ht_ptr->size; cell_i++)
+    for (uint32_t cell_i = 0; cell_i < ht_ptr->size; cell_i++)
     {
         if (cell_i < ht_ptr->size - 1)
-            fprintf (file, "\t\tnode%lu -> node%lu [color = red, constraint = false, arrowhead = none]\n", cell_i, cell_i + 1);
+            fprintf (file, "\t\tnode%u -> node%u [color = red, constraint = false, arrowhead = none]\n", cell_i, cell_i + 1);
         
         if (ht_ptr->array[cell_i] != NULL)
         {
-            fprintf (file, "\t\tnode%lu -> string%lu_%d [color = navy];\n", cell_i, cell_i, 0);
+            fprintf (file, "\t\tnode%u -> string%u_%d [color = navy];\n", cell_i, cell_i, 0);
 
             struct Node *current = ht_ptr->array[cell_i];
             struct Node *next = current->next;
             
-            for (int node_i = 0; next != NULL; node_i++)
+            for (uint32_t node_i = 0; next != NULL; node_i++)
             {
-                fprintf (file, "\t\tstring%lu_%d -> string%lu_%d [color = navy];\n", 
+                fprintf (file, "\t\tstring%u_%u -> string%u_%u [color = navy];\n", 
                                cell_i, node_i, cell_i, node_i + 1);
 
                 current = next;
