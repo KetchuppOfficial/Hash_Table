@@ -6,7 +6,7 @@
 2. [Dependencies](#dependencies)
 3. [Building](#building)
 4. [Hash functions research](#hash-functions-research)
-    1. [Experiment_Conditions](#experiment-conditions)
+    1. [Experiment Conditions](#experiment-conditions)
     2. [Cringe_1](#cringe1)
     3. [ASCII_Hash](#asciihash)
     4. [Len_Hash](#lenhash)
@@ -40,7 +40,7 @@ The 2nd library is [SHA_256](https://github.com/KetchuppOfficial/SHA_256) that i
 
 ## Paths to libraries
 
-Set your own path(s) to folder(s) with the libraries in **all** Makefiles (you should set path to only MY_LIB_PATH since Version_0):
+Set your own path(s) to folder(s) with the libraries in **all** Makefiles (you should set MY_LIB_PATH since Version_0):
 ```Makefile
 CC     = gcc
 CFLAGS = -Wall -Werror -Wshadow -Wfloat-equal -Wswitch-default
@@ -62,7 +62,13 @@ Using my hash table is quite simple.
 git clone git@github.com:KetchuppOfficial/Hash_Table.git
 ```
 
-**Step 2:** Build the project
+**Step 2:** Clone repositories with My_Lib and SHA-256, if you haven't already done that.
+```bash
+git@github.com:KetchuppOfficial/My_Lib.git
+git@github.com:KetchuppOfficial/SHA_256.git
+```
+
+**Step 3:** Build the project
 ```bash
 ketchupp@ketchupp-HVY-WXX9:~/Programming/Semester_2/Hash_Table/Not_Optimized$ make
 Collecting dependencies for "src/Hash_Research.c"...
@@ -77,22 +83,26 @@ Linking project...
 ```
 
 Some options are supported:
-1) You can make a .png image of the hash table using (only in Not_Optimized version):
+1) You can make a .png image of the hash table using:
 ```bash
-make OPT=-DDUMP
+make OPT=-DDUMP     # supported only in Not_Opimized version
 ```
-2) You can turn on all **MY_ASSERT** macros from **My_Lib** and showing the number of word in the hash table (kind of debug mode):
+2) You can turn on showing the number of word in the hash table and all **MY_ASSERT** macros from **My_Lib** (kind of debug mode):
 ```bash
 make OPT=-DDEBUG
 ```
-3) Previous options can be used simultaneously:
+3) Some basic compiler options such as optimization flag **-O2** can be used:
 ```bash
-make OPT=-DDEBUG\ -DDUMP    # don't forget backslash!
+make OPT=-O2
+```
+4) Previous options can be used simultaneously:
+```bash
+make OPT=-DDEBUG\ -DDUMP\ -O2    # don't forget backslash!
 ```
 
 All version of the hash table (Not_Optimized, Version_O, ..., Version_3) are built with debug information (**-g** flag). Version_1, ... Version_3 have to be built with **-O1**, **-O2** or **-O3** flag.
 
-**Step 3:** Running
+**Step 4:** Running
 ```bash
 make run
 ```
@@ -114,11 +124,11 @@ make profile
 
 ## Experiment conditions
 
-Hash table was filled with words of *"The Lord of the Rings"*. If a word has already been added, it won't be added again. Consequently each word differs from others. It means that this experiment is a way to estimate the quality of a hash function.
+Hash table was filled with words of *"The Lord of the Rings"* by John Ronald Reuel Tolkien. If a word has already been added, it won't be added again. Consequently each word differs from others. It means that this experiment is a way to estimate the quality of a hash function.
 
 My program calculates the number of collisions in every bucket and prints it into a .txt file. This data is visualized as bar charts with the help of python script [Bar_Chart.py](/Not_Optimized/src/Histogram.py).
 
-The size of the hash table was chosen to be 2000 so that the load factor is approximately 8,24 (less than 10). The maximum value on the Ox axis of the first 3 bar charts is 500 instead of 2000. That's because there were no words in hash table buckets with indexes [500, ..., 1999] while using first 3 hash functions.
+The size of the hash table was chosen to be 2000 so that the load factor is approximately 8,24 (less than 10). The maximal value on the Ox axis of the first 3 bar charts is 500 instead of 2000. That's because there were no words in hash table buckets with indexes [500, ..., 1999] while using first 3 hash functions.
 
 ## Cringe_1
 
@@ -132,7 +142,7 @@ static inline uint32_t Cringe_1 (const char *data)
 
 ![Cringe_1](Not_Optimized/Hash_Research/Cringe-1.png)
 
-This function is obviously the worst hash function ever because only one list is filled with elements.
+**Cringe_1** is obviously the worst hash function ever because only one bucket is filled with elements.
 
 ## ASCII_Hash
 
@@ -146,7 +156,7 @@ static inline uint32_t ASCII_Hash (const char *data)
 
 ![ASCII_HASH](Not_Optimized/Hash_Research/ASCII-Hash.png)
 
-Although **ASCII_Hash** is better than **Cringe_1**, it is not of a high quality because there is a great number of empty lists in the hash table.
+Although **ASCII_Hash** is better than **Cringe_1**, it is not of a high quality because there is a great number of empty buckets in the hash table.
 
 ## Len_Hash
 
@@ -160,7 +170,7 @@ static inline uint32_t Len_Hash (const char *data)
 
 ![Len_Hash](Not_Optimized/Hash_Research/Len-Hash.png)
 
-**Len_Hash** is even worse than **ASCII_HASH**: the number of empty lists and the maximal number of collisions increased.
+**Len_Hash** is even worse than **ASCII_HASH**: the number of empty buckets and the maximal number of collisions increased.
 
 ## Checksum
 
@@ -179,11 +189,11 @@ static inline uint32_t Checksum (const char *data)
 
 ![Checksum](Not_Optimized/Hash_Research/Checksum.png)
 
-**Checksum** is definitely better than previous hash functions, but it's not good enough too. Distribution of data by lists is not uniform.
+**Checksum** is definitely better than previous hash functions, but it's not good enough too. Distribution of data by buckets is not uniform.
 
 ## Ded_Hash
 
-This function is usually called **ror hash**, but in my work I named after my teacher[Ded](https://github.com/ded32), who told me about this function.
+This function is usually called **ror hash**, but in my work I named after my teacher [Ded](https://github.com/ded32), who told me about this function.
 ```C
 static inline uint32_t ror_32 (uint32_t num, uint32_t shift)
 {
@@ -203,6 +213,8 @@ static inline uint32_t Ded_Hash (const char *data)
 
 ![Ded_Hash](Not_Optimized/Hash_Research/Ded-Hash.png)
 
+**Ded_Hash** has more uniform distribution of data by buckets than **Checksum** but it's still far from ideal.
+
 ## CRC-32
 
 An implementation of **CRC_32** can be seen [here](Not_Optimized/src/Hash_Table.c).
@@ -221,7 +233,7 @@ There is no qualitative difference between **SHA_256** and **CRC_32**.
 
 ## Conclusion
 
-**SHA-256** and **CRC-32** have shown the best result. As far as the algorithm of **SHA-256** is kind of difficult, we will use **CRC-32** at the second part of the work.
+**SHA-256** and **CRC-32** have shown the best result. As far as the algorithm of **SHA-256** is kind of difficult, we will use **CRC-32** in the second part of the work.
 
 # Hash table optimization
 
