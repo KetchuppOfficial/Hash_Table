@@ -101,7 +101,7 @@ char *HT_Insert (struct Hash_Table *ht_ptr, const char *const data)
 
     // Calculates crc-32
     __asm__(
-        "movq $0xFFFFFFFFFFFFFFFF, %%rax\n\t"
+        "or $0xFFFFFFFFFFFFFFFF, %%rax\n\t"
         "crc32q (%1),     %%rax\n\t"
         "crc32q 0x08(%1), %%rax\n\t"
         "crc32q 0x10(%1), %%rax\n\t"
@@ -184,7 +184,7 @@ int HT_Search (const struct Hash_Table *const ht_ptr, const char *const data)
 
     // Calculates crc-32
     __asm__(
-        "movq $0xFFFFFFFFFFFFFFFF, %%rax\n\t"
+        "or $0xFFFFFFFFFFFFFFFF, %%rax\n\t"
         "crc32q (%1),     %%rax\n\t"
         "crc32q 0x08(%1), %%rax\n\t"
         "crc32q 0x10(%1), %%rax\n\t"
@@ -280,7 +280,7 @@ int HT_Delete (struct Hash_Table *const ht_ptr, const char *const data)
 
     // Calculates crc-32
     __asm__(
-        "movq $0xFFFFFFFFFFFFFFFF, %%rax\n\t"
+        "or $0xFFFFFFFFFFFFFFFF, %%rax\n\t"
         "crc32q (%1),     %%rax\n\t"
         "crc32q 0x08(%1), %%rax\n\t"
         "crc32q 0x10(%1), %%rax\n\t"

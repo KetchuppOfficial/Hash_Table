@@ -215,7 +215,13 @@ There is no qualitative difference between **SHA_256** and **CRC_32**.
 
 The hash table is known for quick search of data. Thus, I implemented a test that loads **HT_Search** function to the maximum. The test function searches every word in the hash table 5000 times.
 
-I used **callgrind** to get profiling data and **kcachegrind** to visualize it. There are some references to "clock signals" below. It means processor clock signals I got information about from the lower line of **kcachegrind** window. The performance of the hash table was also measured by the tool **time** that was run by a bash script [measure.sh](/Optimized/measure.sh).
+I used **callgrind** to get profiling data and **kcachegrind** to visualize it. There are some references to "clock signals" below. It means processor clock signals I got information about from the lower line of **kcachegrind** window. 
+
+The performance of the hash table was also measured by the tool **time** that was run by [measure.sh](/Optimized/measure.sh). Tables below contain fields called *real* and *user*. Let's explain what do the mean.
+
+**Real** is wall clock time - time from start to finish of the call. This is all elapsed time including time used by other processes and time the process spends blocked (for example if it is waiting for I/O to complete).
+
+**User** is the amount of CPU time spent in user-mode code (outside the kernel) within the process. This is only actual CPU time used in executing the process. Other processes and time the process spends blocked do not count towards this figure.
 
 Because the task obliges to implement one optimization with Intel<sup>&reg;</sup> Intrinsics, all optimized versions of the program were compiled with **-O1** optimization flag.
 
@@ -269,7 +275,7 @@ Because of fixating the length of strings that the hash table contain, there wer
 3) **Insert_Word** doesn't put '\0' at the end of a string anymore;
 4) **Divide_In_Words** cleans the whole **str** buffer.
 
-Let's look at the profiling data and measurements of the execution time:
+Let's analyse the profiling data and the time measurement results:
 
 ![profiling_data_1](/Optimized/Version_1/measurements/profiling_data.png)
 
@@ -297,7 +303,7 @@ uint32_t hash = 0;
 
 // Calculates crc-32
 __asm__(
-    "movq $0xFFFFFFFFFFFFFFFF, %%rax\n\t"
+    "or $0xFFFFFFFFFFFFFFFF, %%rax\n\t"
     "crc32q (%1),     %%rax\n\t"
     "crc32q 0x08(%1), %%rax\n\t"
     "crc32q 0x10(%1), %%rax\n\t"
@@ -317,7 +323,7 @@ This version of crc-32 can handle only 32-character strings. It allows us to get
 
 Let's look at the results of optimization.
 
-![profiling_data_1](/Optimized/Version_2/measurements/profiling_data.png)
+![profiling_data_2](/Optimized/Version_2/measurements/profiling_data.png)
 
 Execution time:
 
@@ -333,178 +339,36 @@ Execution time:
 
 I suppose there is no doubt the next function to optimize is HT_Search.
 
-# !!! THE NEXT PART IS NOT READY YET
+## Version 3
 
-## Version 2
+**HT_Search** is a simple function that calculates hash and calls **List_Search**. It also includes one conditional operator. Thus, I suppose the right way to optimize **HT_Search** is to implement it in assembly with both **List_Search** and **Fast_Cmp** embedede. I've managed to do so. You can see new **HT_Search** implementation [here](/Optimized/Version_3/src/HT_Search.s).
 
-I could use Intel<sup>&reg;</sup> intrinsics to accelerate *strcmp* but absence of optimization flags for the compiler ruins this idea. If we don't use -O1, intrinsics will work very slow because data will be pushed into RAM instead of registers. As I use no optimization flags, the only option is to implement a function to compare strings in the assembly language. Here is the source code (you can also look at it [here](Optimized/Version_2/Str_Cmp_SSE.s)):
+Let's turn to the profiling data.
 
-```assembly
-Str_Cmp_SSE:
-    
-        xor     r10, r10                    ; chars counter
-        mov     r9, rdx                     ; saving len
+![profiling_data_3](/Optimized/Version_3/measurements/profiling_data.png)
 
-        mov     rax, 16                     ; len_1 for pcmpestri          
-        mov     rdx, 16                     ; len_2 for pcmpestri
+Execution time:
 
-        jmp     .condition
+|                       |   real   |   user   |
+|-----------------------|----------|----------|
+|    average time, s    |   4,2    |   4.2    |
+| standard deviation, s |   0,1    |   0,1    |
+|     clock ticks       |    6 759 798 303    |
 
-.for:
+    Boost in time: 7,3% (comaring to Version_2) or 45,5% (comaring to Version_0)
 
-        movups  xmm1, [rdi + r10]           ; loading str_1
-        movups  xmm2, [rsi + r10]           ; loading str_2
+    Boost in clock ticks: 11,3% (comparing to Version_2) or 73,6% (comapring to Version_0)
 
-        pcmpestri xmm1, xmm2, 00001100b ; ---+
-        ;                                    |
-        ;                                    | LOOK HERE (find more in intel docs)
-        ;                                   \|/
-        ;                                    *
-        ;               no effect -> 0 0 0 0 1 1 0 0 b
-        ;                              \./ | \./ |  \.
-        ;                          ____/   |  |   \.  128-bit sources are treated as 16 packed bytes
-        ; index encodes least    /         |   \.   bytes are unsigned
-        ; significant byte of res2        /      mode is equal ordered
-        ;                           res2 = res1  
-
-        test    ecx, ecx                    ; checking if string are equal
-        jne     .not_equal
-
-        add     r10, 16                     ; move to the next 16 bytes
-
-.condition:
-        cmp     r10, r9                     ; compare up to the end of str_1
-        jb      .for
-
-        xor     rax, rax                    ; return 0, if equal
-        ret
-
-.not_equal:
-        mov     rax, 1                      ; return 1, if not equal
-        ret   
-```
-
-The results or profiling are:
-
-![Version_2](Optimized/Version_2/Version_2.png)
-![Insert_Words_V2](Optimized/Version_2/Insert_Word.png)
-![HT_Search_V2](Optimized/Version_2/HT_Search.png)
-
-After this optimization, the program undoubtedly works faster but the boost is only 9,4% comparing to [Version_1](Optimized/Version_0) and 28,8% comparing to [Version_0](Optimized/Version_1). The result is worse than after the first optimization but still good enough to continue.
-
-## Version_3
-
-As they say, rewrite, so big. I was curious and looked how gcc compiles *HT_Search* function. Here is a small piece of assembly code:
-
-```assembly
-HT_Search:
-.LFB15:
-	.cfi_startproc
-	endbr64
-	push	rbp
-	.cfi_def_cfa_offset 16
-	.cfi_offset 6, -16
-	mov	rbp, rsp
-	.cfi_def_cfa_register 6
-	sub	rsp, 48
-	mov	QWORD PTR -40[rbp], rdi
-	mov	QWORD PTR -48[rbp], rsi
-	mov	rax, QWORD PTR -40[rbp]
-	mov	rdx, QWORD PTR 8[rax]
-	mov	rax, QWORD PTR -48[rbp]
-	mov	rdi, rax
-	call	rdx
-	mov	QWORD PTR -8[rbp], rax
-	mov	rax, QWORD PTR -40[rbp]
-	mov	rcx, QWORD PTR 16[rax]
-	mov	rax, QWORD PTR -8[rbp]
-	mov	edx, 0
-```
-
-The idea is that gcc pushes parameters of the function into the stack and then works with them via RAM. No one will argue that this method is way slower than using registers. That's why I decided to rewrite the whole *HT_Search* function in the assembly language.
-
-There is a but: since Version_3 hash table can be used only with *Ded_Hash* as a hash function. You can't choose hash function anymore. I've done this because having more than one hash function obliges to use a pointer on a function as a field of hash table structure or to implement various *HT_Search*, *HT_Insert* and *HT_Delete*: one for each hash function. The first solution decreases speed and the second is not interesting to solve. I suppose everybody can write exactly the same pieces of code replacing a specific part of them. 
-
-Good news is that I inlined *Ded_Hash* into *HT_Search* that should make a positive impact on the performance. However, we still need *Ded_Hash* implementation in an independent file for *HT_Insert* and *HT_Delete*. You can see brand new *HT_Search* [here](Optimized/Version_3/HT_Search.s).
-
-No let's see what have callgrind got.
-
-![Version_3](Optimized/Version_3/Version_3.png)
-![Insert_Word](Optimized/Version_3/Insert_Word.png)
-
-The hash table accelerated by approximately 10,6% comparing to Version_2; total acceleration is about 36,3%.
-
-Let's see on the result more carefully. *HT_Search* is still executed 5,7 times slower than *HT_Insert* and there's nothing else to optimize in *HT_Search*. Well, maybe there is but I won't compete with gcc enpowered with -O2 in the sport "Who puts variables in registers better?" as I'll lose. 
-
-What should we do next? *Insert_Word* still takes the longest execution time of *Divide_In_Words* but *Insert_Word* is optimized as much as possible. Look at the current realization: the function is as simply as it can be (don't look at the conditional compilation).
-
-```C
-#if DEBUG == 1
-static inline int Insert_Word (struct Hash_Table *ht_ptr, char *const str)
-#elif DEBUG == 0
-static inline void Insert_Word (struct Hash_Table *ht_ptr, char *const str)
-#endif
-{
-    if (HT_Search (ht_ptr, str) == NOT_FOUND)
-    {
-        #if DEBUG == 0
-        HT_Insert (ht_ptr, str);
-        #elif DEBUG == 1
-        int ret_val = HT_Insert (ht_ptr, str);
-        MY_ASSERT (ret_val != ERROR, "HT_Insert ()", FUNC_ERROR, ERROR);
-        return 1;
-        #endif
-    }
-
-    #if DEBUG == 1
-    return 0;
-    #endif
-}
-```
-
-Of course, I can try to speed *HT_Insert* up but it won't result in a great increase in the performance as *HT_Insert* already works way faster than *HT_Search* (it's on the 9th position in the callgrind list). I think it's time to leave *Insert_Word* and move forward.
-
-## Version_4
-
-The next function that can be boosted is mysterious *__ctype_b_loc*. Actually, there is no mystery, just good old *isalpha*. Let's completely remove it by changing
-```C
-if ( isalpha (buffer[symb_i]) || buffer[symb_i] == '\'')
-    str[letter_i++] = buffer[symb_i];
-```
-into
-```C
-if ( ('a' <= buffer[symb_i] && buffer[symb_i] <= 'z') || 
-     ('A' <= buffer[symb_i] && buffer[symb_i] <= 'Z') || 
-                               buffer[symb_i] == '\'')
-    {
-        str[letter_i++] = buffer[symb_i];
-    }
-```
-and look what it will lead to.
-
-Callgrind arrives with great news!
-
-![Version_4](Optimized/Version_4/Version_4.png)
-
-Comparing to Version_3, the boost is approximately 10,8%. Total boost is about 42,9%.
-
-As we see in the last picture, functions on lines 2-4 are already optimized. Optimizing *HT_Insert* isn't reasonalbe (as it was mentioned). I'm obviously not good enough to make *malloc*, *calloc*, *strlen* and *memcpy* better than they already are. We can continue improving performance of *Divide_In_Words* but we won't. Firstly, this function is just a test for functions that work with hash table such as *HT_Insert* and *HT_Search*. That's why optimizing it won't optimize hash table itself. Secondly, apart from calling *HT_Search* and *HT_Insert* *Divide_In_Words* has conditional operators and a cycle. We could try to optimize them by implementing this function in the assembly language but gcc with -O2 flag would do a better job. So, Version_4 is the last one.
+We see that **HT_Search** is still on the top to the callgrind list, thought it's optimized to the maximum. It means, it's time to stop our work here.
 
 ## Conclusion
 
-We succeded in accelerating the work of hash table. It took 290 210 517 clock signals to execute Version_0 and only 165 580 372 to execute Version_4 that is approximately 42,9% boost. Let's compare the final result with Version_0 compiled with flags -O1, -O2 and -O3.
+We succeded in accelerating the hash table in terms of searching. Total boost is ~45,5% in time (words ~1,83 times faster) and ~73,6% in clock ticks.
 
-|                 | Clock signals |
-|-----------------|---------------|
-| My optimization |  165 580 372  |
-|       -O1       |  134 331 275  |
-|       -O2       |  135 796 371  |
-|       -O3       |  135 617 014  |
-
-The result is that my optimization is relatively close to the result of gcc with one of optimization flags -O1, -O2 or -O3. Let's calculate the most important coefficient that is widely known Ded_Coefficient.
+Let's calculate the most important coefficient that is widely known Ded_Coefficient.
 
 Ded_Coefficient = (acceleration value / number of assembly lines) * 1000
 
-We will count only instruction and won't count comments, labels or names of functions. Taking this into consideration, we find: Ded_Hash.s - 10 lines, HT_Search.s - 48 lines, Str_Cmp_SSE.s - 17 lines. All in all:
+We will count only instructions and won't count comments, labels or names of functions. Taking this into consideration, we find: inline assembly - 14 lines, nasm - 38 lines. All in all: 52 lines
 
-Ded_Coefficient = (43,2 / 75) * 1000 = 572
+Ded_Coefficient = (1,83 / 52) * 1000 = 35,2
