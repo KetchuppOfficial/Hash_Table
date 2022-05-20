@@ -4,25 +4,25 @@
 2. [Building](#building)
 3. [Dependencies](#dependencies)
 4. [Hash functions research](#hash-functions-research)
-    1. [Cringe_1](#cringe1)
-    2. [ASCII_Hash](#asciihash)
-    3. [Len_Hash](#lenhash)
-    4. [Checksum](#checksum)
-    5. [Ded_Hash](#dedhash)
-    6. [CRC_32]()
-    6. [SHA_256](#sha256)
-    7. [Conclusion](#conclusion)
+    1. [Experiment_Conditions](#experiment-conditions)
+    2. [Cringe_1](#cringe1)
+    3. [ASCII_Hash](#asciihash)
+    4. [Len_Hash](#lenhash)
+    5. [Checksum](#checksum)
+    6. [Ded_Hash](#dedhash)
+    7. [CRC_32]()
+    8. [SHA_256](#sha256)
+    9. [Conclusion](#conclusion)
 5. [Hash table optimizaton](#hash-table-optimization)
     1. [Version_0](#version-0)
     2. [Version_1](#version-1)
     3. [Version_2](#version-2)
     4. [Version_3](#version-3)
-    5. [Version_4](#version-4)
     6. [Conclusion](#conclusion-1)
 
 # General information
 
-This project is a C implementation of *hash table* - a well known data structure. My hash table supports 7 hash functions, which quality were carefully studied and are presented below. A unique feature of this project is its second part - optimization of hash table with the help of knowledge in processor architecture.
+This project is a C implementation of **hash table** - a well known data structure. My hash table supports 7 hash functions, which quality were carefully studied. A unique feature of this project is its second part - optimization of hash table with the help of knowledge in processor architecture.
 
 # Building
 
@@ -47,7 +47,7 @@ Compiling "src/Hash_Research.c"...
 Linking project...
 ```
 
-If you compile **Not_Opimized** version of the hash table, you can use some options:
+If you can also use some options:
 1) You can make a .png image of the hash table using:
 ```bash
 make OPT=-DDUMP
@@ -61,7 +61,7 @@ make OPT=-DDEBUG
 make OPT=-DDEBUG\ -DDUMP    # don't forget backslash!
 ```
 
-All version of the hash table (Not_Optimized, Version_O, ..., Version_4) are built with debug information (-g) and no optimization flags.
+All version of the hash table (Not_Optimized, Version_O, ..., Version_3) are built with debug information (-g). Version_1, ... Version_3 have to be built with **-O1**, **-O2** or **-O3** flag.
 
 **Step 3:** Running
 ```bash
@@ -71,6 +71,14 @@ make run
 If you wand to delete all object and dependencies files from `./build/`, run:
 ```bash
 make clean
+```
+
+**Extra step:** Profiling
+
+Version_0, ..., Version_3 support measuring their performance by **callgrind** and **kcachegrind**. To use it, run:
+
+```bash
+make profile
 ```
 
 # Dependencies
@@ -87,7 +95,7 @@ The 2nd library is [SHA_256](https://github.com/KetchuppOfficial/SHA_256) that i
 
 ## Paths to libraries
 
-Set your own path(s) to folder(s) with the libraries in [Makefile](/Not_Optimized/Makefile):
+Set your own path(s) to folder(s) with the libraries in Makefiles (you should set path to only MY_LIB_PATH since Version_0):
 ```Makefile
 CC     = gcc
 CFLAGS = -Wall -Werror -Wshadow -Wfloat-equal -Wswitch-default
@@ -102,11 +110,13 @@ MY_LIB_PATH  = /home/ketchupp/Programming/My_Lib/       # <---- and here
 
 # Hash functions research
 
-**Experiment conditions.** Hash table was filled with words of *"The Lord of the Rings"*. If a word has already been added, it won't be added again. Consequently each word differs from others. It means that this experiment is a way to estimate the quality of a hash function.
+## Experiment conditions
 
-My program calculates the number of collisions in every bucket and prints it into a .txt file. This data is visualized with the help of **python**. You can see information about hash functions, that were used, below.
+Hash table was filled with words of *"The Lord of the Rings"*. If a word has already been added, it won't be added again. Consequently each word differs from others. It means that this experiment is a way to estimate the quality of a hash function.
 
-The size of the hash table was chosen to be 2000 so that the load factor is approximately 8,24. The maximum value on the Ox axis of the first 3 bar charts is 500 instead of 2000. That's because there was no words in hash table buckets with indexes [500, ..., 1999] while using first 3 hash functions.
+My program calculates the number of collisions in every bucket and prints it into a .txt file. This data is visualized as as bar charts with the help of python script [Bar_Chart.py](/Not_Optimized/src/Histogram.py).
+
+The size of the hash table was chosen to be 2000 so that the load factor is approximately 8,24 (less than 10). The maximum value on the Ox axis of the first 3 bar charts is 500 instead of 2000. That's because there were no words in hash table buckets with indexes [500, ..., 1999] while using first 3 hash functions.
 
 ## Cringe_1
 
@@ -148,7 +158,7 @@ static inline uint32_t Len_Hash (const char *data)
 
 ![Len_Hash](Not_Optimized/Hash_Research/Len-Hash.png)
 
-**Len_Hash** is even worse than **ASCII_HASH**: the number of empty lists increased.
+**Len_Hash** is even worse than **ASCII_HASH**: the number of empty lists and the maximal number of collisions increased.
 
 ## Checksum
 
@@ -197,7 +207,7 @@ An implementation of **CRC_32** can be seen [here](Not_Optimized/src/Hash_Table.
 
 ![CRC_32](Not_Optimized/Hash_Research/CRC-32.png)
 
-**CRC_32** have shown the best result among previous hash functions. The maximum number of collisions is of the same order as the load factor.
+**CRC_32** have shown the best result among previous hash functions. The maximal number of collisions is of the same order as the load factor.
 
 ## SHA-256
 
@@ -217,9 +227,9 @@ The hash table is known for quick search of data. Thus, I implemented a test tha
 
 I used **callgrind** to get profiling data and **kcachegrind** to visualize it. There are some references to "clock signals" below. It means processor clock signals I got information about from the lower line of **kcachegrind** window. 
 
-The performance of the hash table was also measured by the tool **time** that was run by [measure.sh](/Optimized/measure.sh). Tables below contain fields called *real* and *user*. Let's explain what do the mean.
+The performance of the hash table was also measured by the tool **time** that was run by [measure.sh](/Optimized/measure.sh). Tables below contain fields called *real* and *user*. Let's explain what does that mean.
 
-**Real** is wall clock time - time from start to finish of the call. This is all elapsed time including time used by other processes and time the process spends blocked (for example if it is waiting for I/O to complete).
+**Real** is wall clock time - time from start to finish of the call. This is all elapsed time including time used by other processes and time the process spends blocked (for example if it is waiting for input/output to complete).
 
 **User** is the amount of CPU time spent in user-mode code (outside the kernel) within the process. This is only actual CPU time used in executing the process. Other processes and time the process spends blocked do not count towards this figure.
 
@@ -233,7 +243,7 @@ There are no optimizations in this version. Nevertheless, it differs from [Not_O
 2) Dumping hash table and making bar charts in not supported;
 3) Stress test added.
 
-As we see in the picture below, execution of **crc_32** takes the longest time.
+As we see in the picture below, execution of **__memcmp_avx2_movbe** takes the longest time.
 
 ![profiling_data_0](/Optimized/Version_0/measurements/profiling_data.png)
 
@@ -247,9 +257,11 @@ As we see in the picture below, execution of **crc_32** takes the longest time.
 
 Profiling data shows us that we should optimize **__memcmp_avx2_movbe**. Well, I haven't used this function in my program. It turns out **gcc** used **__memcmp_avx2_movbe** instead of **memcmp** to make memory comparison faster. I suppose I can do this job even better.
 
+There is also one more importand detail in the profiling data: the list doen't contain **List_Search**. It means that **gcc** embedded it in **HT_Search**.
+
 ## Version 1
 
-My hash table contains English words. The maximum length of a word in *The Lord of the Rings* is 16 letters (we know it from results of **Len_Hash**). It means that, the probability that there will be more than 32 letters in a word of a fiction novel tends to 0. That's why there is no harm in implementing a function that compares only words of 32 letters. I've done so:
+My hash table contains English words. The longest words in *The Lord of the Rings* are of 16 letters (we know it from results of **Len_Hash**). It means that, the probability that there will be more than 32 letters in a word of a fiction novel tends to 0. That's why there is no harm in implementing a function that compares only words of 32 letters. I've done so:
 
 ```C
 #define RIGHT_MASK 0xFFFFFFFF
@@ -269,7 +281,7 @@ static int Fast_Cmp (const char *str_1, const char *str_2)
 
     !!! WARNING: if you want to use HT_Search to find a word, it must be of the size 32 + '\0' at the end (so, 33 characters in general).
 
-Because of fixating the length of strings that the hash table contain, there were also made some other changes in the code:
+Because of fixating the length of strings that are contained in the hash table, there were also made some other changes in the code:
 1) **len** field removed from **struct Node**;
 2) Measuring of a string length in **Add_Node** removed;
 3) **Insert_Word** doesn't put '\0' at the end of a string anymore;
@@ -341,7 +353,7 @@ I suppose there is no doubt the next function to optimize is HT_Search.
 
 ## Version 3
 
-**HT_Search** is a simple function that calculates hash and calls **List_Search**. It also includes one conditional operator. Thus, I suppose the right way to optimize **HT_Search** is to implement it in assembly with both **List_Search** and **Fast_Cmp** embedede. I've managed to do so. You can see new **HT_Search** implementation [here](/Optimized/Version_3/src/HT_Search.s).
+**HT_Search** is a simple function that calculates hash and calls **List_Search**. It also includes one conditional operator. Thus, I suppose the right way to optimize **HT_Search** is to implement it in assembly with both **List_Search** and **Fast_Cmp** embedded. I've managed to do so. You can see new **HT_Search** implementation [here](/Optimized/Version_3/src/HT_Search.s).
 
 Let's turn to the profiling data.
 
@@ -359,7 +371,7 @@ Execution time:
 
     Boost in clock ticks: 11,3% (comparing to Version_2) or 73,6% (comapring to Version_0)
 
-We see that **HT_Search** is still on the top to the callgrind list, thought it's optimized to the maximum. It means, it's time to stop our work here.
+We see that **HT_Search** is still on the top to the callgrind list, though it's optimized to the maximum. It means, it's time to stop our work here.
 
 ## Conclusion
 
