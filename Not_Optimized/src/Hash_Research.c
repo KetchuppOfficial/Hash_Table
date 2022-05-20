@@ -183,7 +183,7 @@ int HT_Show_Collisons (const struct Hash_Table *ht_ptr)
     Close_File (file, file_name);
     free (file_name);
 
-    Print_Histogram ("./src/Histogram.py", path, hash_func_name);
+    Print_Histogram ("./src/Bar_Chart.py", path, hash_func_name);
 
     free (collision_arr);
 
