@@ -1,8 +1,10 @@
+![Linux](https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black)
+
 # Hash table, its optimization and hash functions quality research
 
 1. [General information](#general-information)
-2. [Building](#building)
-3. [Dependencies](#dependencies)
+2. [Dependencies](#dependencies)
+3. [Building](#building)
 4. [Hash functions research](#hash-functions-research)
     1. [Experiment_Conditions](#experiment-conditions)
     2. [Cringe_1](#cringe1)
@@ -10,7 +12,7 @@
     4. [Len_Hash](#lenhash)
     5. [Checksum](#checksum)
     6. [Ded_Hash](#dedhash)
-    7. [CRC_32]()
+    7. [CRC_32](#crc-32)
     8. [SHA_256](#sha256)
     9. [Conclusion](#conclusion)
 5. [Hash table optimizaton](#hash-table-optimization)
@@ -24,13 +26,40 @@
 
 This project is a C implementation of **hash table** - a well known data structure. My hash table supports 7 hash functions, which quality were carefully studied. A unique feature of this project is its second part - optimization of hash table with the help of knowledge in processor architecture.
 
+# Dependencies
+
+This project consists of both new code and two static libraries that were also implemented by me some time ago.
+
+## My_Lib
+
+The 1st library is [My_Lib](https://github.com/KetchuppOfficial/My_Lib) that is used for work with files and debugging with the help of log files.
+
+## SHA_256
+
+The 2nd library is [SHA_256](https://github.com/KetchuppOfficial/SHA_256) that is an implementation of a well known hash function SHA-256 based on information from [Wikipedia](https://en.wikipedia.org/wiki/SHA-2).
+
+## Paths to libraries
+
+Set your own path(s) to folder(s) with the libraries in **all** Makefiles (you should set path to only MY_LIB_PATH since Version_0):
+```Makefile
+CC     = gcc
+CFLAGS = -Wall -Werror -Wshadow -Wfloat-equal -Wswitch-default
+
+DBG = -g
+
+SHA_LIB_PATH = /home/ketchupp/Programming/SHA_256/      # <---- here
+MY_LIB_PATH  = /home/ketchupp/Programming/My_Lib/       # <---- and here
+
+# don't forget about backslash in the end of each path!
+```
+
 # Building
 
 Using my hash table is quite simple.
 
 **Step 1:** Clone this repository
 ```bash
-$ git clone git@github.com:KetchuppOfficial/Hash_Table.git
+git clone git@github.com:KetchuppOfficial/Hash_Table.git
 ```
 
 **Step 2:** Build the project
@@ -47,8 +76,8 @@ Compiling "src/Hash_Research.c"...
 Linking project...
 ```
 
-If you can also use some options:
-1) You can make a .png image of the hash table using:
+Some options are supported:
+1) You can make a .png image of the hash table using (only in Not_Optimized version):
 ```bash
 make OPT=-DDUMP
 ```
@@ -61,7 +90,7 @@ make OPT=-DDEBUG
 make OPT=-DDEBUG\ -DDUMP    # don't forget backslash!
 ```
 
-All version of the hash table (Not_Optimized, Version_O, ..., Version_3) are built with debug information (-g). Version_1, ... Version_3 have to be built with **-O1**, **-O2** or **-O3** flag.
+All version of the hash table (Not_Optimized, Version_O, ..., Version_3) are built with debug information (**-g** flag). Version_1, ... Version_3 have to be built with **-O1**, **-O2** or **-O3** flag.
 
 **Step 3:** Running
 ```bash
@@ -81,40 +110,13 @@ Version_0, ..., Version_3 support measuring their performance by **callgrind** a
 make profile
 ```
 
-# Dependencies
-
-This project consists of both new code and two static libraries that were also implemented by me some time ago.
-
-## My_Lib
-
-The 1st library is [My_Lib](https://github.com/KetchuppOfficial/My_Lib) that is used for work with files and debugging with the help of log files.
-
-## SHA_256
-
-The 2nd library is [SHA_256](https://github.com/KetchuppOfficial/SHA_256) that is an implementation of a well known hash function SHA-256 based on information from [Wikipedia](https://en.wikipedia.org/wiki/SHA-2).
-
-## Paths to libraries
-
-Set your own path(s) to folder(s) with the libraries in Makefiles (you should set path to only MY_LIB_PATH since Version_0):
-```Makefile
-CC     = gcc
-CFLAGS = -Wall -Werror -Wshadow -Wfloat-equal -Wswitch-default
-
-DBG = -g
-
-SHA_LIB_PATH = /home/ketchupp/Programming/SHA_256/      # <---- here
-MY_LIB_PATH  = /home/ketchupp/Programming/My_Lib/       # <---- and here
-
-# don't forget about backslash in the end of each path!
-```
-
 # Hash functions research
 
 ## Experiment conditions
 
 Hash table was filled with words of *"The Lord of the Rings"*. If a word has already been added, it won't be added again. Consequently each word differs from others. It means that this experiment is a way to estimate the quality of a hash function.
 
-My program calculates the number of collisions in every bucket and prints it into a .txt file. This data is visualized as as bar charts with the help of python script [Bar_Chart.py](/Not_Optimized/src/Histogram.py).
+My program calculates the number of collisions in every bucket and prints it into a .txt file. This data is visualized as bar charts with the help of python script [Bar_Chart.py](/Not_Optimized/src/Histogram.py).
 
 The size of the hash table was chosen to be 2000 so that the load factor is approximately 8,24 (less than 10). The maximum value on the Ox axis of the first 3 bar charts is 500 instead of 2000. That's because there were no words in hash table buckets with indexes [500, ..., 1999] while using first 3 hash functions.
 
