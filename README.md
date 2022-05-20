@@ -386,3 +386,9 @@ Ded_Coefficient = (acceleration value / number of assembly lines) * 1000
 We will count only instructions and won't count comments, labels or names of functions. Taking this into consideration, we find: inline assembly - 14 lines, nasm - 38 lines. All in all: 52 lines
 
 Ded_Coefficient = (1,83 / 52) * 1000 = 35,2
+
+# Puzzle
+
+Find as many catch phrases as you can in this picture.
+
+![Puzzle](/Not_Optimized/Dump/Dump.png)
