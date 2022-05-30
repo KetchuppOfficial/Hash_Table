@@ -38,21 +38,6 @@ The 1st library is [My_Lib](https://github.com/KetchuppOfficial/My_Lib) that is 
 
 The 2nd library is [SHA_256](https://github.com/KetchuppOfficial/SHA_256) that is an implementation of a well known hash function SHA-256 based on information from [Wikipedia](https://en.wikipedia.org/wiki/SHA-2).
 
-## Paths to libraries
-
-Set your own path(s) to folder(s) with the libraries in **all** Makefiles (you should set MY_LIB_PATH since Version_0):
-```Makefile
-CC     = gcc
-CFLAGS = -Wall -Werror -Wshadow -Wfloat-equal -Wswitch-default
-
-DBG = -g
-
-SHA_LIB_PATH = /home/ketchupp/Programming/SHA_256/      # <---- here
-MY_LIB_PATH  = /home/ketchupp/Programming/My_Lib/       # <---- and here
-
-# don't forget about backslash in the end of each path!
-```
-
 # Building
 
 Using my hash table is quite simple.
@@ -63,15 +48,20 @@ git clone git@github.com:KetchuppOfficial/Hash_Table.git
 cd Hash_Table
 ```
 
-**Step 2:** Clone repositories with My_Lib and SHA-256, if you haven't already done that.
+**Step 2:** Clone submodule.
 ```bash
-git@github.com:KetchuppOfficial/My_Lib.git
-git@github.com:KetchuppOfficial/SHA_256.git
+git submodule init
+git submodule update
 ```
+
+**Step 3:** Choose one version and go to the appropriate folder. For example:
+```bash
+cd Not_Optimized
+``` 
 
 **Step 3:** Build the project
 ```bash
-ketchupp@ketchupp-HVY-WXX9:~/Programming/Semester_2/Hash_Table/Not_Optimized$ make
+username@machine:~/Hash_Table/Not_Optimized$ make
 Collecting dependencies for "src/Hash_Research.c"...
 Collecting dependencies for "src/Hash_Table_Dump.c"...
 Collecting dependencies for "src/Hash_Table.c"...
@@ -80,6 +70,8 @@ Compiling "src/main.c"...
 Compiling "src/Hash_Table.c"...
 Compiling "src/Hash_Table_Dump.c"...
 Compiling "src/Hash_Research.c"...
+Building library...
+Building library...
 Linking project...
 ```
 
