@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # $1 - program to run
-# $2 - file to wirte results into
+# $2 - file to write results into
 
 make OPT=-O1
 > $2
