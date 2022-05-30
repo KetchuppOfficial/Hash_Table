@@ -1,0 +1,6 @@
+[submodule "lib/SHA_256"]
+	path = lib/SHA_256
+	url = https://github.com/KetchuppOfficial/SHA_256
+[submodule "lib/My_Lib"]
+	path = lib/My_Lib
+	url = https://github.com/KetchuppOfficial/My_Lib
