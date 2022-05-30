@@ -60,6 +60,7 @@ Using my hash table is quite simple.
 **Step 1:** Clone this repository
 ```bash
 git clone git@github.com:KetchuppOfficial/Hash_Table.git
+cd Hash_Table
 ```
 
 **Step 2:** Clone repositories with My_Lib and SHA-256, if you haven't already done that.
