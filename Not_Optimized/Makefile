@@ -1,8 +1,6 @@
 CC     = gcc
 CFLAGS = -Wall -Werror -Wshadow -Wfloat-equal -Wswitch-default
 
-DBG = -g
-
 BIN      = ./bin/
 SRCDIR   = ./src/
 BUILDDIR = ./build/
@@ -34,7 +32,7 @@ $(LIBSDIR):
 $(BUILDDIR)%.o: $(SRCDIR)%.c
 	@mkdir -p $(dir $@)
 	@echo "Compiling \"$<\"..."
-	@$(CC) $(CFLAGS) $(FIND) $(DBG) $(OPT) -c $< -o $@
+	@$(CC) $(CFLAGS) $(FIND) $(DBG) $(OPT) -c -g $< -o $@
 
 include $(DEPS)
 

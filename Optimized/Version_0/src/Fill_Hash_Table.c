@@ -68,16 +68,8 @@ char **HT_Fill (struct Hash_Table *ht_ptr, const char *file_name, int *n_words)
     MY_ASSERT (ht_ptr, "struct Hash_Table *ht_ptr", NULL_PTR, NULL);
     MY_ASSERT (ht_ptr, "const char *file_name",     NULL_PTR, NULL);
 
-    FILE *file = Open_File (file_name, "rb");
-    MY_ASSERT (file, "Open_File ()", FUNC_ERROR, NULL);
-
-    long n_symbs = Define_File_Size (file);
-    MY_ASSERT (n_symbs != ERROR, "Define_File_Size ()", FUNC_ERROR, NULL);
-
-    char *buffer = Make_Buffer (file, n_symbs);
-    MY_ASSERT (buffer, "Make_Buffer ()", FUNC_ERROR, NULL);
-
-    Close_File (file, file_name);
+    long n_symbs = 0;
+    char *buffer = Make_File_Buffer (file_name, &n_symbs);
 
     char **words_arr = Divide_In_Words (ht_ptr, buffer, n_symbs, n_words);
     free (buffer);

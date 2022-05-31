@@ -8,7 +8,7 @@ const char *text = "../../The Lord of the Rings.txt";
 int main (void)
 {
     #ifdef DEBUG
-    OPEN_LOG_FILE;
+    Open_Log_File ("Version_0");
     #endif
 
     struct Hash_Table *ht_ptr = HT_Ctor (2000);
